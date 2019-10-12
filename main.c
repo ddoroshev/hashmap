@@ -5,7 +5,7 @@
 int main(void)
 {
     int i;
-    hashmap *hm = hashmap_init(HASHMAP_BASE_SIZE);
+    hashmap *hm = hashmap_init();
     int keys[HASHMAP_BASE_SIZE] = {
         156, 167, 234, 343, 75, 884, 500, 590,
         /* 0   1    2    3   4    5    6    7 */

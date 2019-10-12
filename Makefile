@@ -6,7 +6,7 @@ CC = gcc
 CFLAGS = -I.
 
 OBJS = alloc.o array.o hashmap.o
-TEST_OBJS = tests/test_array.o tests/test.o
+TEST_OBJS = tests/test_array.o tests/test_hashmap.o tests/test.o
 MAIN_OBJS = main.o
 REBUILDABLES = $(OBJS) $(MAIN_OBJS) $(TEST_OBJS) $(TARGET)
 
@@ -27,6 +27,7 @@ $(TESTS_TARGET): $(TEST_OBJS) $(OBJS)
 
 tests/test.o: tests/assert.h
 tests/test_array.o: array.h alloc.h tests/assert.h
+tests/test_hashmap.o: hashmap.h alloc.h tests/assert.h
 main.o: hashmap.h array.h alloc.h
 hashmap.o: hashmap.h array.h alloc.h
 array.o: array.h alloc.h

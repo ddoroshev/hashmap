@@ -4,8 +4,9 @@
 #include "array.h"
 #include "hashmap.h"
 
-hashmap *hashmap_init(int length)
+hashmap *hashmap_init()
 {
+    int length = HASHMAP_BASE_SIZE;
     hashmap *hm = malloc(sizeof(hashmap));
     if (hm == NULL) {
         return NULL;
@@ -30,7 +31,9 @@ hashmap *hashmap_init(int length)
 void hashmap_free(hashmap *hm)
 {
     array_free(hm->keys);
+    hm->keys = NULL;
     array_free(hm->values);
+    hm->values = NULL;
     free(hm);
 }
 
@@ -40,10 +43,11 @@ int hashmap_set(hashmap *hm, int key, HASHMAP_VALUE value)
     if (index == -1) {
         return -E_HASHMAP_FULL;
     }
-    if (array_set_value(hm->keys, index, key) == -1) {
+    if (array_set_value(hm->keys, index, key) != 0) {
         return -E_HASHMAP_CANNOT_SET_KEY;
     }
-    if (array_set_value(hm->values, index, *value) == -1) {
+    if (array_set_value(hm->values, index, *value) != 0) {
+        array_delete_value(hm->keys, index);
         return -E_HASHMAP_CANNOT_SET_VALUE;
     }
 
@@ -57,10 +61,11 @@ int hashmap_delete(hashmap *hm, int key)
         return index;
     }
 
-    if (array_delete_value(hm->keys, index) == -1) {
+    /* Not sure if these errors are possible */
+    if (array_delete_value(hm->keys, index) != 0) {
         return -E_HASHMAP_CANNOT_DELETE_KEY;
     }
-    if (array_delete_value(hm->values, index) == -1) {
+    if (array_delete_value(hm->values, index) != 0) {
         return -E_HASHMAP_CANNOT_DELETE_VALUE;
     }
 
@@ -109,7 +114,7 @@ int _hashmap_find_index(hashmap *hm, int key)
             return index;
         }
         index++;
-        if (index >= hm->length) {
+        if (index == hm->length) {
             index = 0;
         }
         if (index == init_index) {
@@ -131,7 +136,7 @@ int _hashmap_find_empty_index(hashmap *hm, int key)
             return index;
         }
         index++;
-        if (index >= hm->length) {
+        if (index == hm->length) {
             index = 0;
         }
         if (index == init_index) {

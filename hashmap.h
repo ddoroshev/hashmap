@@ -18,7 +18,7 @@ typedef struct {
     array *values;
 } hashmap;
 
-hashmap *hashmap_init(int length);
+hashmap *hashmap_init();
 void hashmap_free(hashmap *hm);
 void hashmap_dump(hashmap *hm);
 

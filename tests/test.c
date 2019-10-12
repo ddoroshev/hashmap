@@ -9,5 +9,13 @@ int main(void)
     test_array_set_value();
     test_array_delete_value();
 
+    test_hashmap_init();
+    test_hashmap_init_fail();
+    test_hashmap_free();
+    test_hashmap_dump();
+    test_hashmap_set();
+    test_hashmap_get();
+    test_hashmap_delete();
+
     FIN;
 }
