@@ -19,6 +19,12 @@ test: CFLAGS += -Wno-implicit-function-declaration
 test: $(TESTS_TARGET)
 	./bin/tests
 
+cov: CFLAGS += -fprofile-arcs -ftest-coverage
+cov: clean test
+	lcov --directory . --capture --output-file info.cov
+	mkdir -p cov-report
+	genhtml -o cov-report info.cov
+
 $(TESTS_TARGET): $(TEST_OBJS) $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
@@ -33,4 +39,4 @@ hashmap.o: hashmap.h array.h alloc.h
 array.o: array.h alloc.h
 
 clean:
-	rm -f $(REBUILDABLES) $(TESTS_TARGET)
+	rm -rf $(REBUILDABLES) $(TESTS_TARGET) **/*.gcda **/*.gcno *.cov cov-report

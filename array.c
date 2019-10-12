@@ -46,7 +46,7 @@ void array_free(array *ar)
 
 int array_set_value(array *ar, int index, int val)
 {
-    if (index >= ar->length || index < 0) {
+    if (index < 0 || index >= ar->length) {
         return -E_ARRAY_INDEX_OUT_OF_RANGE;
     }
     int *v = malloc(sizeof(int));
@@ -61,7 +61,7 @@ int array_set_value(array *ar, int index, int val)
 
 int *array_get_value(array *ar, int index)
 {
-    if (index >= ar->length) {
+    if (index < 0 || index >= ar->length) {
         return NULL;
     }
     return ar->values[index];
@@ -69,7 +69,7 @@ int *array_get_value(array *ar, int index)
 
 int array_delete_value(array *ar, int index)
 {
-    if (index >= ar->length) {
+    if (index < 0 || index >= ar->length) {
         return -E_ARRAY_INDEX_OUT_OF_RANGE;
     }
     free(ar->values[index]);

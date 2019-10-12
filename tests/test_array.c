@@ -74,9 +74,11 @@ void test_array_delete_value(void)
     array *ar = array_init(length);
 
     array_set_value(ar, 1, 2);
-    array_delete_value(ar, 1);
-
+    ASSERT(array_delete_value(ar, 1) == 0);
     ASSERT(array_get_value(ar, 1) == NULL);
+
+    ASSERT(array_delete_value(ar, -1) == -E_ARRAY_INDEX_OUT_OF_RANGE);
+    ASSERT(array_delete_value(ar, length) == -E_ARRAY_INDEX_OUT_OF_RANGE);
 
     array_free(ar);
 }
