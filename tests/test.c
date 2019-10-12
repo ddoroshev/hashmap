@@ -1,3 +1,5 @@
+#include "tests/assert.h"
+
 int main(void)
 {
     test_array_init();
@@ -6,4 +8,6 @@ int main(void)
     test_array_free();
     test_array_set_value();
     test_array_delete_value();
+
+    FIN;
 }

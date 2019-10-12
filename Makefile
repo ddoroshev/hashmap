@@ -25,10 +25,11 @@ $(TESTS_TARGET): $(TEST_OBJS) $(OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
+tests/test.o: tests/assert.h
 tests/test_array.o: array.h alloc.h tests/assert.h
 main.o: hashmap.h array.h alloc.h
 hashmap.o: hashmap.h array.h alloc.h
 array.o: array.h alloc.h
 
 clean:
-	rm -f $(REBUILDABLES)
+	rm -f $(REBUILDABLES) $(TESTS_TARGET)
