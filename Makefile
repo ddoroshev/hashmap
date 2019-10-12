@@ -12,5 +12,9 @@ $(TARGET): $(OBJS)
 %.o: %.c
 	gcc -o $@ -c $<
 
+main.o: hashmap.h array.h
+hashmap.o: hashmap.h array.h
+array.o: array.h
+
 clean:
 	rm -f $(REBUILDABLES)

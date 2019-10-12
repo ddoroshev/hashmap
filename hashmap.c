@@ -34,29 +34,33 @@ void hashmap_free(hashmap *hm)
     free(hm);
 }
 
-int hashmap_set_value(hashmap *hm, int key, HASHMAP_VALUE value)
+int hashmap_set(hashmap *hm, int key, HASHMAP_VALUE value)
 {
-    int init_index = key & (HASHMAP_BASE_SIZE - 1);
-    int index = init_index;
-
-    for (;;) {
-        int *pkey = array_get_value(hm->keys, index);
-        if (pkey == NULL) {
-            break;
-        }
-        index++;
-        if (index >= hm->length) {
-            index = 0;
-        }
-        if (index == init_index) {
-            return -1;
-        }
+    int index = _hashmap_find_empty_index(hm, key);
+    if (index == -1) {
+        return -1;
     }
-
     if (array_set_value(hm->keys, index, key) == -1) {
         return -1;
     }
     if (array_set_value(hm->values, index, *value) == -1) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int hashmap_delete(hashmap *hm, int key)
+{
+    int index = _hashmap_find_index(hm, key);
+    if (index == -1) {
+        return -1;
+    }
+
+    if (array_delete_value(hm->keys, index) == -1) {
+        return -1;
+    }
+    if (array_delete_value(hm->values, index) == -1) {
         return -1;
     }
 
@@ -82,7 +86,16 @@ void hashmap_dump(hashmap *hm)
     }
 }
 
-int *hashmap_get_value(hashmap *hm, int key)
+int *hashmap_get(hashmap *hm, int key)
+{
+    int index = _hashmap_find_index(hm, key);
+    if (index == -1) {
+        return NULL;
+    }
+    return array_get_value(hm->values, index);
+}
+
+int _hashmap_find_index(hashmap *hm, int key)
 {
     int init_index = key & (HASHMAP_BASE_SIZE - 1);
     int index = init_index;
@@ -90,19 +103,41 @@ int *hashmap_get_value(hashmap *hm, int key)
     for (;;) {
         int *pkey = array_get_value(hm->keys, index);
         if (pkey == NULL) {
-            return NULL;
+            break;
         }
         if (*pkey == key) {
-            break;
+            return index;
         }
         index++;
         if (index >= hm->length) {
             index = 0;
         }
         if (index == init_index) {
-            return NULL;
+            break;
         }
     }
 
-    return array_get_value(hm->values, index);
+    return -1;
+}
+
+int _hashmap_find_empty_index(hashmap *hm, int key)
+{
+    int init_index = key & (HASHMAP_BASE_SIZE - 1);
+    int index = init_index;
+
+    for (;;) {
+        int *pkey = array_get_value(hm->keys, index);
+        if (pkey == NULL) {
+            return index;
+        }
+        index++;
+        if (index >= hm->length) {
+            index = 0;
+        }
+        if (index == init_index) {
+            break;
+        }
+    }
+
+    return -1;
 }

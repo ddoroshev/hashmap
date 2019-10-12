@@ -12,11 +12,11 @@ int main(void)
     };
 
     for (i = 0; i < HASHMAP_BASE_SIZE; i++) {
-        hashmap_set_value(hm, keys[i], &i);
+        hashmap_set(hm, keys[i], &i);
     }
 
     for (i = 0; i < HASHMAP_BASE_SIZE; i++) {
-        int *pval = hashmap_get_value(hm, keys[i]);
+        int *pval = hashmap_get(hm, keys[i]);
         if (pval == NULL) {
             printf("[%d]: NOT EXIST\n", keys[i]);
         } else {
@@ -24,6 +24,10 @@ int main(void)
         }
     }
     printf("\n");
+    hashmap_dump(hm);
+    printf("\n");
+
+    hashmap_delete(hm, 234);
     hashmap_dump(hm);
 
     hashmap_free(hm);
