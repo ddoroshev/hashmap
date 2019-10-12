@@ -35,7 +35,7 @@ void test_array_free(void)
 {
     array *ar = array_init(3);
     array_free(ar);
-    ASSERT(ar->values != NULL);
+    ASSERT(ar->values == NULL);
 }
 
 void test_array_set_value(void)
