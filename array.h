@@ -1,6 +1,7 @@
 #pragma once
 
 #define E_ARRAY_INDEX_OUT_OF_RANGE 1
+#define E_ALLOC 2
 
 typedef struct {
     int length;

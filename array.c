@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "alloc.h"
 #include "array.h"
 
 array *array_init(int length)
@@ -39,15 +40,19 @@ void array_free(array *ar)
         array_delete_value(ar, i);
     }
     free(ar->values);
+    ar->values = NULL;
     free(ar);
 }
 
 int array_set_value(array *ar, int index, int val)
 {
-    if (index >= ar->length) {
+    if (index >= ar->length || index < 0) {
         return -E_ARRAY_INDEX_OUT_OF_RANGE;
     }
     int *v = malloc(sizeof(int));
+    if (v == NULL) {
+        return -E_ALLOC;
+    }
     *v = val;
     ar->values[index] = v;
 
