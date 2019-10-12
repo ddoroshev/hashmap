@@ -76,7 +76,7 @@ void test_array_delete_value(void)
     array_set_value(ar, 1, 2);
     array_delete_value(ar, 1);
 
-    assert(array_get_value(ar, 1) != NULL);
+    assert(array_get_value(ar, 1) == NULL);
 
     array_free(ar);
 }
