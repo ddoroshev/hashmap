@@ -27,16 +27,23 @@ hashmap *hashmap_init(int length)
     return hm;
 }
 
-int hashmap_set_value(hashmap *hm, int key, HASH_VALUE value)
+int hashmap_set_value(hashmap *hm, int key, HASHMAP_VALUE value)
 {
-    int index = key & HASH_MASK;
-    int *pkey = array_get_value(hm->keys, index);
-    if (pkey != NULL) {
-        index = 0;
-    }
-    while (pkey != NULL) {
+    int init_index = key & (HASHMAP_BASE_SIZE - 1);
+    int index = init_index;
+
+    for (;;) {
+        int *pkey = array_get_value(hm->keys, index);
+        if (pkey == NULL) {
+            break;
+        }
         index++;
-        pkey = array_get_value(hm->keys, index);
+        if (index >= hm->length) {
+            index = 0;
+        }
+        if (index == init_index) {
+            return -1;
+        }
     }
 
     if (array_set_value(hm->keys, index, key) == -1) {
@@ -70,17 +77,25 @@ void hashmap_dump(hashmap *hm)
 
 int *hashmap_get_value(hashmap *hm, int key)
 {
-    int index = key & HASH_MASK;
-    int *probe_key = array_get_value(hm->keys, index);
-    if (probe_key == NULL) {
-        return NULL;
-    }
-    if (*probe_key != key) {
-        index = 0;
-    }
-    while (probe_key != NULL && *probe_key != key) {
+    int init_index = key & (HASHMAP_BASE_SIZE - 1);
+    int index = init_index;
+
+    for (;;) {
+        int *pkey = array_get_value(hm->keys, index);
+        if (pkey == NULL) {
+            return NULL;
+        }
+        if (*pkey == key) {
+            break;
+        }
         index++;
-        probe_key = array_get_value(hm->keys, index);
+        if (index >= hm->length) {
+            index = 0;
+        }
+        if (index == init_index) {
+            return NULL;
+        }
     }
+
     return array_get_value(hm->values, index);
 }
