@@ -1,7 +1,16 @@
+#pragma once
+
 #include "array.h"
 
 #define HASHMAP_BASE_SIZE 8
 #define HASHMAP_VALUE int*
+
+#define E_HASHMAP_KEY_NOT_FOUND 1
+#define E_HASHMAP_FULL 2
+#define E_HASHMAP_CANNOT_SET_KEY 3
+#define E_HASHMAP_CANNOT_SET_VALUE 4
+#define E_HASHMAP_CANNOT_DELETE_KEY 5
+#define E_HASHMAP_CANNOT_DELETE_VALUE 6
 
 typedef struct {
     int length;

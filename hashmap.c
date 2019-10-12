@@ -38,13 +38,13 @@ int hashmap_set(hashmap *hm, int key, HASHMAP_VALUE value)
 {
     int index = _hashmap_find_empty_index(hm, key);
     if (index == -1) {
-        return -1;
+        return -E_HASHMAP_FULL;
     }
     if (array_set_value(hm->keys, index, key) == -1) {
-        return -1;
+        return -E_HASHMAP_CANNOT_SET_KEY;
     }
     if (array_set_value(hm->values, index, *value) == -1) {
-        return -1;
+        return -E_HASHMAP_CANNOT_SET_VALUE;
     }
 
     return 0;
@@ -53,15 +53,15 @@ int hashmap_set(hashmap *hm, int key, HASHMAP_VALUE value)
 int hashmap_delete(hashmap *hm, int key)
 {
     int index = _hashmap_find_index(hm, key);
-    if (index == -1) {
-        return -1;
+    if (index < 0) {
+        return index;
     }
 
     if (array_delete_value(hm->keys, index) == -1) {
-        return -1;
+        return -E_HASHMAP_CANNOT_DELETE_KEY;
     }
     if (array_delete_value(hm->values, index) == -1) {
-        return -1;
+        return -E_HASHMAP_CANNOT_DELETE_VALUE;
     }
 
     return 0;
@@ -89,7 +89,7 @@ void hashmap_dump(hashmap *hm)
 int *hashmap_get(hashmap *hm, int key)
 {
     int index = _hashmap_find_index(hm, key);
-    if (index == -1) {
+    if (index == -E_HASHMAP_KEY_NOT_FOUND) {
         return NULL;
     }
     return array_get_value(hm->values, index);
@@ -117,7 +117,7 @@ int _hashmap_find_index(hashmap *hm, int key)
         }
     }
 
-    return -1;
+    return -E_HASHMAP_KEY_NOT_FOUND;
 }
 
 int _hashmap_find_empty_index(hashmap *hm, int key)
@@ -139,5 +139,5 @@ int _hashmap_find_empty_index(hashmap *hm, int key)
         }
     }
 
-    return -1;
+    return -E_HASHMAP_KEY_NOT_FOUND;
 }

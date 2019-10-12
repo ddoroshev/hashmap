@@ -1,5 +1,7 @@
 #pragma once
 
+#define E_ARRAY_INDEX_OUT_OF_RANGE 1
+
 typedef struct {
     int length;
     int **values;
