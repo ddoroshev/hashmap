@@ -27,6 +27,13 @@ hashmap *hashmap_init(int length)
     return hm;
 }
 
+void hashmap_free(hashmap *hm)
+{
+    array_free(hm->keys);
+    array_free(hm->values);
+    free(hm);
+}
+
 int hashmap_set_value(hashmap *hm, int key, HASHMAP_VALUE value)
 {
     int init_index = key & (HASHMAP_BASE_SIZE - 1);
