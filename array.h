@@ -5,10 +5,10 @@ typedef struct {
     int **values;
 } array;
 
-array *init_array(int length);
-void free_array(array *ar);
-void dump_array(array *ar);
+array *array_init(int length);
+void array_free(array *ar);
+void array_dump(array *ar);
 
-int set_value(array *ar, int index, int val);
-int *get_value(array *ar, int index);
-int delete_value(array *ar, int index);
+int array_set_value(array *ar, int index, int val);
+int *array_get_value(array *ar, int index);
+int array_delete_value(array *ar, int index);

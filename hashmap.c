@@ -1,94 +1,86 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define HASH_SIZE 8
-#define HASH_MASK 0b111
+#include "array.h"
+#include "hashmap.h"
 
-typedef char HASH_KEY[3];
-typedef int* HASH_VALUE;
-
-typedef struct {
-    HASH_VALUE values[HASH_SIZE];
-} hash_map;
-
-void init_hm(hash_map*);
-int get_value(hash_map*, HASH_KEY);
-void set_value(hash_map*, HASH_KEY, HASH_VALUE);
-void delete_value(hash_map*, HASH_KEY);
-int hashsum(HASH_KEY);
-void dump_pointers(hash_map*);
-
-int main(void)
+hashmap *hashmap_init(int length)
 {
-    int i;
-    char keys[][HASH_SIZE] = {
-        "abc", "cde", "def", "efg",
-        "ghi", "hij", "ijk", "jkl"
-    };
-    hash_map hm;
-    init_hm(&hm);
-
-    for (i = 0; i < HASH_SIZE; i++) {
-        int val = i;
-        set_value(&hm, keys[i], &val);
+    hashmap *hm = malloc(sizeof(hashmap));
+    if (hm == NULL) {
+        return NULL;
     }
-    dump_pointers(&hm);
-    for (i = 0; i < HASH_SIZE; i++) {
-        get_value(&hm, keys[i]);
+
+    hm->keys = array_init(length);
+    if (hm->keys == NULL) {
+        free(hm);
+        return NULL;
+    }
+    hm->values = array_init(length);
+    if (hm->values == NULL) {
+        free(hm->keys);
+        free(hm);
+        return NULL;
+    }
+
+    hm->length = length;
+    return hm;
+}
+
+int hashmap_set_value(hashmap *hm, int key, HASH_VALUE value)
+{
+    int index = key & HASH_MASK;
+    int *pkey = array_get_value(hm->keys, index);
+    if (pkey != NULL) {
+        index = 0;
+    }
+    while (pkey != NULL) {
+        index++;
+        pkey = array_get_value(hm->keys, index);
+    }
+
+    if (array_set_value(hm->keys, index, key) == -1) {
+        return -1;
+    }
+    if (array_set_value(hm->values, index, *value) == -1) {
+        return -1;
     }
 
     return 0;
 }
 
-void init_hm(hash_map *hm)
+void hashmap_dump(hashmap *hm)
 {
-    for (int i = 0; i < HASH_SIZE; i++) {
-        hm->values[i] = NULL;
+    int *pkey, *pvalue;
+    for (int i = 0; i < hm->length; i++) {
+        pkey = array_get_value(hm->keys, i);
+        if (pkey == NULL) {
+            printf("NULL => ");
+        } else {
+            printf("%d => ", *pkey);
+        }
+        pvalue = array_get_value(hm->values, i);
+        if (pvalue == NULL) {
+            printf("NULL\n");
+        } else {
+            printf("%d\n", *pvalue);
+        }
     }
 }
 
-int get_value(hash_map *hm, HASH_KEY key)
+int *hashmap_get_value(hashmap *hm, int key)
 {
-    int h = hashsum(key);
-    int prob_index = h & HASH_MASK;
-    if (hm->values[prob_index] == NULL) {
-        return -1;
+    int index = key & HASH_MASK;
+    int *probe_key = array_get_value(hm->keys, index);
+    if (probe_key == NULL) {
+        return NULL;
     }
-    int val = *hm->values[prob_index];
-    printf("get_value: [%s] -> %d, %d\n", key, prob_index, val);
-    return val;
-}
-
-void set_value(hash_map *hm, HASH_KEY key, HASH_VALUE value)
-{
-    HASH_VALUE _value = (HASH_VALUE)malloc(sizeof(value));
-    _value = value;
-    printf("addr %p\n", _value);
-    int h = hashsum(key);
-    int prob_index = h & HASH_MASK;
-    hm->values[prob_index] = _value;
-
-    printf("set [%s (%d)] -> [%d]\n", key, prob_index, *_value);
-}
-
-void delete_value(hash_map *hm, HASH_KEY key)
-{
-    return;
-}
-
-void dump_pointers(hash_map *hm)
-{
-    for (int i = 0; i < HASH_SIZE; i++) {
-        printf("%p\n", hm->values[i]);
+    if (*probe_key != key) {
+        index = 0;
     }
-}
-
-int hashsum(HASH_KEY key)
-{
-    int h = 0;
-    for (int i = 0; i < 3; i++) {
-        int charcode = (int)key[i];
-        h += charcode;
+    while (probe_key != NULL && *probe_key != key) {
+        index++;
+        probe_key = array_get_value(hm->keys, index);
     }
-    return h;
+    return array_get_value(hm->values, index);
 }
