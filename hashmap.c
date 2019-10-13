@@ -41,7 +41,7 @@ void hashmap_free(hashmap *hm)
 int hashmap_set(hashmap *hm, int key, HASHMAP_VALUE value)
 {
     int index = _hashmap_find_empty_index(hm, key);
-    if (index == -1) {
+    if (index == -E_HASHMAP_KEY_NOT_FOUND) {
         return -E_HASHMAP_FULL;
     }
     if (array_set_value(hm->keys, index, key) != 0) {
