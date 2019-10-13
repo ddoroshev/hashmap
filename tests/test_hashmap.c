@@ -20,6 +20,7 @@ void test_hashmap_init_fail(void)
     WITH_SUCCESS_ALLOCS(0, ASSERT(hashmap_init(1) == NULL));
     WITH_SUCCESS_ALLOCS(1, ASSERT(hashmap_init(1) == NULL));
     WITH_SUCCESS_ALLOCS(2, ASSERT(hashmap_init(1) == NULL));
+    WITH_SUCCESS_ALLOCS(3, ASSERT(hashmap_init(1) == NULL));
 }
 
 void test_hashmap_free(void)
@@ -72,11 +73,37 @@ void test_hashmap_get(void)
 void test_hashmap_delete(void)
 {
     hashmap *hm = hashmap_init();
-    for (int i = 0; i < 3; i++) {
+    int i;
+    for (i = 0; i < 3; i++) {
         hashmap_set(hm, i, &i);
     }
-    ASSERT(hashmap_delete(hm, 0) == 0);
+
     ASSERT(hashmap_delete(hm, 10) == -E_HASHMAP_KEY_NOT_FOUND);
+
+    for (i = 0; i < 3; i++) {
+        ASSERT(hashmap_delete(hm, i) == 0);
+    }
+    ASSERT(hashmap_delete(hm, 0) == -E_HASHMAP_KEY_NOT_FOUND);
+
+    hashmap_free(hm);
+}
+
+void test_hashmap_find_index(void)
+{
+    hashmap *hm = hashmap_init();
+    int i;
+    for (i = 0; i < 7; i++) {
+        hashmap_set(hm, i, &i);
+    }
+    ASSERT(_hashmap_find_index(hm, 0) == 0);
+    ASSERT(_hashmap_find_index(hm, 6) == 6);
+    ASSERT(_hashmap_find_index(hm, 7) == -E_HASHMAP_KEY_NOT_FOUND);
+
+    i++;
+    hashmap_set(hm, 7, &i);
+
+    ASSERT(_hashmap_find_index(hm, 8) == -E_HASHMAP_KEY_NOT_FOUND);
+    ASSERT(_hashmap_find_index(hm, 13) == -E_HASHMAP_KEY_NOT_FOUND);
 
     hashmap_free(hm);
 }

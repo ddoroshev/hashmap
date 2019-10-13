@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "alloc.h"
 #include "array.h"
 #include "hashmap.h"
 
@@ -61,13 +62,8 @@ int hashmap_delete(hashmap *hm, int key)
         return index;
     }
 
-    /* Not sure if these errors are possible */
-    if (array_delete_value(hm->keys, index) != 0) {
-        return -E_HASHMAP_CANNOT_DELETE_KEY;
-    }
-    if (array_delete_value(hm->values, index) != 0) {
-        return -E_HASHMAP_CANNOT_DELETE_VALUE;
-    }
+    array_delete_value(hm->keys, index);
+    array_delete_value(hm->values, index);
 
     return 0;
 }

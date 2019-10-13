@@ -17,6 +17,7 @@ int main(void)
     test_hashmap_set();
     test_hashmap_get();
     test_hashmap_delete();
+    test_hashmap_find_index();
 
     FIN;
 }
