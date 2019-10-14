@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "alloc.h"
 #include "array.h"
@@ -13,14 +13,8 @@ hashmap *hashmap_init()
         return NULL;
     }
 
-    hm->keys = array_init(length);
-    if (hm->keys == NULL) {
-        free(hm);
-        return NULL;
-    }
-    hm->values = array_init(length);
+    hm->values = array_init(length, sizeof(hashmap_item));
     if (hm->values == NULL) {
-        free(hm->keys);
         free(hm);
         return NULL;
     }
@@ -31,82 +25,57 @@ hashmap *hashmap_init()
 
 void hashmap_free(hashmap *hm)
 {
-    array_free(hm->keys);
-    hm->keys = NULL;
     array_free(hm->values);
     hm->values = NULL;
     free(hm);
 }
 
-int hashmap_set(hashmap *hm, int key, HASHMAP_VALUE value)
+int hashmap_set(hashmap *hm, char *key, int value)
 {
     int index = _hashmap_find_empty_index(hm, key);
     if (index == -E_HASHMAP_KEY_NOT_FOUND) {
         return -E_HASHMAP_FULL;
     }
-    if (array_set_value(hm->keys, index, key) != 0) {
-        return -E_HASHMAP_CANNOT_SET_KEY;
-    }
-    if (array_set_value(hm->values, index, *value) != 0) {
-        array_delete_value(hm->keys, index);
+    if (array_set_item(hm->values, index, &(hashmap_item){key, value}) != 0) {
         return -E_HASHMAP_CANNOT_SET_VALUE;
     }
 
     return 0;
 }
 
-int hashmap_delete(hashmap *hm, int key)
+int hashmap_delete(hashmap *hm, char *key)
 {
     int index = _hashmap_find_index(hm, key);
     if (index < 0) {
         return index;
     }
 
-    array_delete_value(hm->keys, index);
-    array_delete_value(hm->values, index);
+    array_delete_item(hm->values, index);
 
     return 0;
 }
 
-void hashmap_dump(hashmap *hm)
-{
-    int *pkey, *pvalue;
-    for (int i = 0; i < hm->length; i++) {
-        pkey = array_get_value(hm->keys, i);
-        if (pkey == NULL) {
-            printf("NULL => ");
-        } else {
-            printf("%d => ", *pkey);
-        }
-        pvalue = array_get_value(hm->values, i);
-        if (pvalue == NULL) {
-            printf("NULL\n");
-        } else {
-            printf("%d\n", *pvalue);
-        }
-    }
-}
-
-int *hashmap_get(hashmap *hm, int key)
+hashmap_item *hashmap_get(hashmap *hm, char *key)
 {
     int index = _hashmap_find_index(hm, key);
     if (index == -E_HASHMAP_KEY_NOT_FOUND) {
         return NULL;
     }
-    return array_get_value(hm->values, index);
+    return array_get_item(hm->values, index);
 }
 
-int _hashmap_find_index(hashmap *hm, int key)
+int _hashmap_find_index(hashmap *hm, char *key)
 {
-    int init_index = key & (HASHMAP_BASE_SIZE - 1);
+    unsigned long h = hash(key);
+    int init_index = (int)(h & (HASHMAP_BASE_SIZE - 1));
     int index = init_index;
 
     for (;;) {
-        int *pkey = array_get_value(hm->keys, index);
-        if (pkey == NULL) {
+        hashmap_item *item = array_get_item(hm->values, index);
+        if (item == NULL) {
             break;
         }
-        if (*pkey == key) {
+        if (strcmp(item->key, key) == 0) {
             return index;
         }
         index++;
@@ -121,14 +90,15 @@ int _hashmap_find_index(hashmap *hm, int key)
     return -E_HASHMAP_KEY_NOT_FOUND;
 }
 
-int _hashmap_find_empty_index(hashmap *hm, int key)
+int _hashmap_find_empty_index(hashmap *hm, char *key)
 {
-    int init_index = key & (HASHMAP_BASE_SIZE - 1);
+    unsigned long h = hash(key);
+    int init_index = (int)(h & (HASHMAP_BASE_SIZE - 1));
     int index = init_index;
 
     for (;;) {
-        int *pkey = array_get_value(hm->keys, index);
-        if (pkey == NULL) {
+        hashmap_item *item = array_get_item(hm->values, index);
+        if (item == NULL) {
             return index;
         }
         index++;
@@ -141,4 +111,16 @@ int _hashmap_find_empty_index(hashmap *hm, int key)
     }
 
     return -E_HASHMAP_KEY_NOT_FOUND;
+}
+
+unsigned long hash(char *s)
+{
+    unsigned long hash = 5381;
+    int c;
+
+    while ((c = *s++)) {
+        hash = ((hash << 5) + hash) + c;
+    }
+
+    return hash;
 }

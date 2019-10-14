@@ -6,28 +6,31 @@ int main(void)
 {
     int i;
     hashmap *hm = hashmap_init();
-    int keys[HASHMAP_BASE_SIZE] = {
-        156, 167, 234, 343, 75, 884, 500, 590,
-        /* 0   1    2    3   4    5    6    7 */
+    char *keys[HASHMAP_BASE_SIZE] = {
+        "ab", "bc", "cd", "de",
+        "ef", "fg", "gh", "hi"
     };
 
+    printf("Hashes:\n");
     for (i = 0; i < HASHMAP_BASE_SIZE; i++) {
-        hashmap_set(hm, keys[i], &i);
+        unsigned long h = hash(keys[i]);
+        printf("%s -> %lu -> %i\n", keys[i], h, (int)(h & (HASHMAP_BASE_SIZE - 1)));
+        hashmap_set(hm, keys[i], i);
     }
 
     for (i = 0; i < HASHMAP_BASE_SIZE; i++) {
-        int *pval = hashmap_get(hm, keys[i]);
+        hashmap_item *pval = hashmap_get(hm, keys[i]);
         if (pval == NULL) {
-            printf("[%d]: NOT EXIST\n", keys[i]);
+            printf("[%s]: NOT EXIST\n", keys[i]);
         } else {
-            printf("[%d]: %d\n", keys[i], *pval);
+            printf("[%s]: %d\n", keys[i], pval->value);
         }
     }
     printf("\n");
     hashmap_dump(hm);
     printf("\n");
 
-    hashmap_delete(hm, 234);
+    hashmap_delete(hm, "cd");
     hashmap_dump(hm);
 
     hashmap_free(hm);

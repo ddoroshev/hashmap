@@ -5,7 +5,7 @@ TESTS_TARGET = ./bin/tests
 CC = gcc
 CFLAGS = -I.
 
-OBJS = alloc.o array.o hashmap.o
+OBJS = alloc.o array.o hashmap.o dump.o
 TEST_OBJS = tests/test_array.o tests/test_hashmap.o tests/test.o
 MAIN_OBJS = main.o
 REBUILDABLES = $(OBJS) $(MAIN_OBJS) $(TEST_OBJS) $(TARGET)
@@ -32,11 +32,12 @@ $(TESTS_TARGET): $(TEST_OBJS) $(OBJS)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 tests/test.o: tests/assert.h
-tests/test_array.o: array.h alloc.h tests/assert.h
-tests/test_hashmap.o: hashmap.h alloc.h tests/assert.h
-main.o: hashmap.h array.h alloc.h
-hashmap.o: hashmap.h array.h alloc.h
+tests/test_array.o: array.h alloc.h hashmap_item.h tests/assert.h
+tests/test_hashmap.o: hashmap.h alloc.h hashmap_item.h tests/assert.h
+main.o: hashmap.h array.h alloc.h hashmap_item.h
+hashmap.o: hashmap.h array.h alloc.h hashmap_item.h
 array.o: array.h alloc.h
+dump.o: array.h hashmap.h hashmap_item.h
 
 clean:
 	rm -rf $(REBUILDABLES) $(TESTS_TARGET) *.gc* tests/*.gc* *.cov cov-report

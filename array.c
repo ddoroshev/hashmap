@@ -1,79 +1,72 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "alloc.h"
 #include "array.h"
 
-array *array_init(int length)
+array *array_init(int length, int item_size)
 {
     array *ar = malloc(sizeof(array));
     if (ar == NULL) {
         return NULL;
     }
-
-    if ((ar->values = malloc(length * sizeof(int*))) == NULL) {
+    ar->items = malloc(length * sizeof(void*));
+    if (ar->items == NULL) {
         free(ar);
         return NULL;
     }
-    for (int i = 0; i < length; i++) {
-        ar->values[i] = NULL;
-    }
-
     ar->length = length;
+    ar->item_size = item_size;
+    array_fill_null(ar);
     return ar;
 }
 
-void array_dump(array *ar)
+void array_fill_null(array *ar)
 {
     for (int i = 0; i < ar->length; i++) {
-        int val = 0;
-        if (ar->values[i] != NULL) {
-            val = *ar->values[i];
-        }
-        printf("%d: %p -> %d\n", i, ar->values[i], val);
+        ar->items[i] = NULL;
     }
+}
+
+int array_set_item(array *ar, int index, void *item)
+{
+    if (index < 0 || index >= ar->length) {
+        return -E_ARRAY_INDEX_OUT_OF_RANGE;
+    }
+    ar->items[index] = malloc(sizeof(void*));
+    if (ar->items[index] == NULL) {
+        return -E_ALLOC;
+    }
+    memcpy(ar->items[index], item, ar->item_size);
+
+    return 0;
+}
+
+void *array_get_item(array *ar, int index)
+{
+    if (index < 0 || index >= ar->length) {
+        return NULL;
+    }
+    return ar->items[index];
 }
 
 void array_free(array *ar)
 {
     for (int i = 0; i < ar->length; i++) {
-        array_delete_value(ar, i);
+        array_delete_item(ar, i);
     }
-    free(ar->values);
-    ar->values = NULL;
+    free(ar->items);
+    ar->items = NULL;
     free(ar);
 }
 
-int array_set_value(array *ar, int index, int val)
+int array_delete_item(array *ar, int index)
 {
     if (index < 0 || index >= ar->length) {
         return -E_ARRAY_INDEX_OUT_OF_RANGE;
     }
-    int *v = malloc(sizeof(int));
-    if (v == NULL) {
-        return -E_ALLOC;
-    }
-    *v = val;
-    ar->values[index] = v;
-
-    return 0;
-}
-
-int *array_get_value(array *ar, int index)
-{
-    if (index < 0 || index >= ar->length) {
-        return NULL;
-    }
-    return ar->values[index];
-}
-
-int array_delete_value(array *ar, int index)
-{
-    if (index < 0 || index >= ar->length) {
-        return -E_ARRAY_INDEX_OUT_OF_RANGE;
-    }
-    free(ar->values[index]);
-    ar->values[index] = NULL;
+    free(ar->items[index]);
+    ar->items[index] = NULL;
 
     return 0;
 }

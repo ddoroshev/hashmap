@@ -6,9 +6,9 @@ int main(void)
     test_array_init_fail();
     test_array_dump();
     test_array_free();
-    test_array_get_value();
-    test_array_set_value();
-    test_array_delete_value();
+    test_array_get_item();
+    test_array_set_item();
+    test_array_delete_item();
 
     test_hashmap_init();
     test_hashmap_init_fail();
