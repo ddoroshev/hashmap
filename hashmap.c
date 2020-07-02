@@ -54,7 +54,7 @@ int hashmap_set(hashmap *hm, char *key, int value)
 int hashmap_ensure_size(hashmap *hm)
 {
     int result;
-    if (hm->count >= USABLE_FRACTION(hm->values->length)) {
+    if (hm->count >= USABLE_FRACTION(array_len(hm->values))) {
         result = hashmap_resize(hm);
         if (result != 0) {
             return result;
@@ -68,14 +68,14 @@ int hashmap_resize(hashmap *hm)
     int result;
     hashmap_item *item;
     array *old_values = hm->values;
-    int new_length = ESTIMATE_SIZE(hm->values->length);
+    int new_length = ESTIMATE_SIZE(array_len(hm->values));
     hm->count = 0;
     hm->values = array_init(new_length, sizeof(hashmap_item));
     if (hm->values == NULL) {
         return -E_ALLOC;
     }
 
-    for (int i = 0; i < old_values->length; i++) {
+    for (int i = 0; i < array_len(old_values); i++) {
         item = old_values->items[i];
         if (item == NULL) {
             continue;
@@ -114,7 +114,7 @@ hashmap_item *hashmap_get(hashmap *hm, char *key)
 int _hashmap_find_index(hashmap *hm, char *key)
 {
     unsigned long h = hash(key);
-    int init_index = (int)(h & (hm->values->length - 1));
+    int init_index = (int)(h & (array_len(hm->values) - 1));
     int index = init_index;
 
     for (;;) {
@@ -126,7 +126,7 @@ int _hashmap_find_index(hashmap *hm, char *key)
             return index;
         }
         index++;
-        if (index == hm->values->length) {
+        if (index == array_len(hm->values)) {
             index = 0;
         }
         if (index == init_index) {
@@ -140,7 +140,7 @@ int _hashmap_find_index(hashmap *hm, char *key)
 int _hashmap_find_empty_index(hashmap *hm, char *key)
 {
     unsigned long h = hash(key);
-    int init_index = (int)(h & (hm->values->length - 1));
+    int init_index = (int)(h & (array_len(hm->values) - 1));
     int index = init_index;
 
     for (;;) {
@@ -149,7 +149,7 @@ int _hashmap_find_empty_index(hashmap *hm, char *key)
             return index;
         }
         index++;
-        if (index == hm->values->length) {
+        if (index == array_len(hm->values)) {
             index = 0;
         }
         if (index == init_index) {

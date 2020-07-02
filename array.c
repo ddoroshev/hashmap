@@ -21,6 +21,11 @@ array *array_init(int length, int item_size)
     return ar;
 }
 
+int array_len(array *ar)
+{
+    return ar->length;
+}
+
 void array_fill_null(array *ar)
 {
     for (int i = 0; i < ar->length; i++) {

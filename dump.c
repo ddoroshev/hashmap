@@ -5,7 +5,7 @@
 
 void array_dump(array *ar)
 {
-    for (int i = 0; i < ar->length; i++) {
+    for (int i = 0; i < array_len(ar); i++) {
         hashmap_item item = {"", 0};
         if (ar->items[i] != NULL) {
             item = *(hashmap_item*)ar->items[i];
@@ -17,7 +17,7 @@ void array_dump(array *ar)
 void hashmap_dump(hashmap *hm)
 {
     hashmap_item *item;
-    for (int i = 0; i < hm->values->length; i++) {
+    for (int i = 0; i < array_len(hm->values); i++) {
         item = array_get_item(hm->values, i);
         if (item == NULL) {
             printf("NULL\n");

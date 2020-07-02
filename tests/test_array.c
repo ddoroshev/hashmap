@@ -13,7 +13,7 @@ void test_array_init(void)
 {
     int length = 10;
     array *ar = array_init(length, item_size);
-    ASSERT(ar->length == length);
+    ASSERT(array_len(ar) == length);
     for (int i = 0; i < length; i++) {
         ASSERT(ar->items[i] == NULL);
     }

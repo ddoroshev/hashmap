@@ -3,7 +3,7 @@ TARGET = ./bin/main
 TESTS_TARGET = ./bin/tests
 
 CC = gcc
-CFLAGS = -I.
+CFLAGS = -I. -Wall
 
 OBJS = alloc.o array.o hashmap.o dump.o
 TEST_OBJS = tests/test_array.o tests/test_hashmap.o tests/test.o
