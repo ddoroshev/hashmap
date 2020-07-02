@@ -4,7 +4,7 @@
 
 short __has_errors;
 
-#define ASSERT(chk)  \
+#define ASSERT(chk) \
     if (!(chk)) { \
         __has_errors = 1; \
         printf("Assertion (%s) failed %s at line %d \n", #chk, __FILE__, __LINE__); \

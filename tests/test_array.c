@@ -15,7 +15,7 @@ void test_array_init(void)
     array *ar = array_init(length, item_size);
     ASSERT(array_len(ar) == length);
     for (int i = 0; i < length; i++) {
-        ASSERT(ar->items[i] == NULL);
+        ASSERT(array_get_item(ar, i) == NULL);
     }
     array_free(ar);
 }
@@ -40,7 +40,7 @@ void test_array_free(void)
 {
     array *ar = array_init(3, item_size);
     array_free(ar);
-    ASSERT(ar->items == NULL);
+    ASSERT(array_empty(ar) == 1);
 }
 
 void test_array_set_item(void)
@@ -49,8 +49,8 @@ void test_array_set_item(void)
     array *ar = array_init(length, item_size);
 
     ASSERT(array_set_item(ar, 1, &(hashmap_item){"ab", 2}) == 0);
-    ASSERT(strcmp(((hashmap_item*)ar->items[1])->key, "ab") == 0);
-    ASSERT(((hashmap_item*)ar->items[1])->value == 2);
+    ASSERT(strcmp(((hashmap_item*)array_get_item(ar, 1))->key, "ab") == 0);
+    ASSERT(((hashmap_item*)array_get_item(ar, 1))->value == 2);
 
     ASSERT(array_set_item(ar, -1, &(hashmap_item){"a", 2}) == -E_ARRAY_INDEX_OUT_OF_RANGE);
     ASSERT(array_set_item(ar, length, &(hashmap_item){"a", 2}) == -E_ARRAY_INDEX_OUT_OF_RANGE);
@@ -67,7 +67,7 @@ void test_array_get_item(void)
 
     array_set_item(ar, 1, &(hashmap_item){"ab", 2});
 
-    ASSERT(strcmp(((hashmap_item*)ar->items[1])->key, "ab") == 0);
+    ASSERT(strcmp(((hashmap_item*)array_get_item(ar, 1))->key, "ab") == 0);
     ASSERT(((hashmap_item*)array_get_item(ar, 1))->value == 2);
     ASSERT(array_get_item(ar, -1) == NULL);
     ASSERT(array_get_item(ar, length) == NULL);

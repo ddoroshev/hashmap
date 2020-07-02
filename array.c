@@ -4,6 +4,13 @@
 #include "alloc.h"
 #include "array.h"
 
+struct array {
+    int length;
+    int item_size;
+
+    void **items;
+};
+
 array *array_init(int length, int item_size)
 {
     array *ar = malloc(sizeof(array));
@@ -57,7 +64,7 @@ void *array_get_item(array *ar, int index)
 
 void array_free(array *ar)
 {
-    for (int i = 0; i < ar->length; i++) {
+    for (int i = ar->length - 1; i >= 0; i--) {
         array_delete_item(ar, i);
     }
     free(ar->items);
@@ -72,6 +79,11 @@ int array_delete_item(array *ar, int index)
     }
     free(ar->items[index]);
     ar->items[index] = NULL;
-
+    ar->length--;
     return 0;
+}
+
+int array_empty(array *ar)
+{
+    return ar->length == 0 && ar->items == NULL;
 }

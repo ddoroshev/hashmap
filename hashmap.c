@@ -76,7 +76,7 @@ int hashmap_resize(hashmap *hm)
     }
 
     for (int i = 0; i < array_len(old_values); i++) {
-        item = old_values->items[i];
+        item = array_get_item(old_values, i);
         if (item == NULL) {
             continue;
         }

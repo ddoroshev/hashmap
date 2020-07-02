@@ -7,10 +7,10 @@ void array_dump(array *ar)
 {
     for (int i = 0; i < array_len(ar); i++) {
         hashmap_item item = {"", 0};
-        if (ar->items[i] != NULL) {
-            item = *(hashmap_item*)ar->items[i];
+        if (array_get_item(ar, i) != NULL) {
+            item = *(hashmap_item*)array_get_item(ar, i);
         }
-        printf("%d: %p -> %s %d\n", i, ar->items[i], item.key, item.value);
+        printf("%d: %p -> %s %d\n", i, array_get_item(ar, i), item.key, item.value);
     }
 }
 

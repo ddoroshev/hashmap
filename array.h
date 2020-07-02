@@ -3,14 +3,10 @@
 #define E_ARRAY_INDEX_OUT_OF_RANGE 1
 #define E_ALLOC 2
 
-typedef struct {
-    int length;
-    int item_size;
-
-    void **items;
-} array;
+typedef struct array array;
 
 array *array_init(int length, int size);
+int array_len(array *ar);
 void array_fill_null(array *ar);
 void array_free(array *ar);
 void array_dump(array *ar);
