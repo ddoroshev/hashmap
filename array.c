@@ -11,6 +11,8 @@ struct array {
     void **items;
 };
 
+void array_fill_null(array *ar);
+
 array *array_init(int length, int item_size)
 {
     array *ar = malloc(sizeof(array));
@@ -40,7 +42,7 @@ void array_fill_null(array *ar)
     }
 }
 
-int array_set_item(array *ar, int index, void *item)
+int array_set(array *ar, int index, void *item)
 {
     if (index < 0 || index >= ar->length) {
         return -E_ARRAY_INDEX_OUT_OF_RANGE;
@@ -54,7 +56,7 @@ int array_set_item(array *ar, int index, void *item)
     return 0;
 }
 
-void *array_get_item(array *ar, int index)
+void *array_get(array *ar, int index)
 {
     if (index < 0 || index >= ar->length) {
         return NULL;
@@ -65,14 +67,14 @@ void *array_get_item(array *ar, int index)
 void array_free(array *ar)
 {
     for (int i = ar->length - 1; i >= 0; i--) {
-        array_delete_item(ar, i);
+        array_delete(ar, i);
     }
     free(ar->items);
     ar->items = NULL;
     free(ar);
 }
 
-int array_delete_item(array *ar, int index)
+int array_delete(array *ar, int index)
 {
     if (index < 0 || index >= ar->length) {
         return -E_ARRAY_INDEX_OUT_OF_RANGE;

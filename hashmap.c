@@ -43,7 +43,7 @@ int hashmap_set(hashmap *hm, char *key, int value)
     if (index == -E_HASHMAP_KEY_NOT_FOUND) {
         return -E_HASHMAP_FULL;
     }
-    if (array_set_item(hm->values, index, &(hashmap_item){key, value}) != 0) {
+    if (array_set(hm->values, index, &(hashmap_item){key, value}) != 0) {
         return -E_HASHMAP_CANNOT_SET_VALUE;
     }
     hm->count++;
@@ -76,7 +76,7 @@ int hashmap_resize(hashmap *hm)
     }
 
     for (int i = 0; i < array_len(old_values); i++) {
-        item = array_get_item(old_values, i);
+        item = array_get(old_values, i);
         if (item == NULL) {
             continue;
         }
@@ -96,7 +96,7 @@ int hashmap_delete(hashmap *hm, char *key)
         return index;
     }
 
-    array_delete_item(hm->values, index);
+    array_delete(hm->values, index);
     hm->count--;
 
     return 0;
@@ -108,7 +108,7 @@ hashmap_item *hashmap_get(hashmap *hm, char *key)
     if (index == -E_HASHMAP_KEY_NOT_FOUND) {
         return NULL;
     }
-    return array_get_item(hm->values, index);
+    return array_get(hm->values, index);
 }
 
 int _hashmap_find_index(hashmap *hm, char *key)
@@ -118,7 +118,7 @@ int _hashmap_find_index(hashmap *hm, char *key)
     int index = init_index;
 
     for (;;) {
-        hashmap_item *item = array_get_item(hm->values, index);
+        hashmap_item *item = array_get(hm->values, index);
         if (item == NULL) {
             break;
         }
@@ -144,7 +144,7 @@ int _hashmap_find_empty_index(hashmap *hm, char *key)
     int index = init_index;
 
     for (;;) {
-        hashmap_item *item = array_get_item(hm->values, index);
+        hashmap_item *item = array_get(hm->values, index);
         if (item == NULL) {
             return index;
         }

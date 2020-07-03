@@ -7,10 +7,9 @@ typedef struct array array;
 
 array *array_init(int length, int size);
 int array_len(array *ar);
-void array_fill_null(array *ar);
 void array_free(array *ar);
 void array_dump(array *ar);
 
-int array_set_item(array *ar, int index, void *item);
-void *array_get_item(array *ar, int index);
-int array_delete_item(array *ar, int index);
+int array_set(array *ar, int index, void *item);
+void *array_get(array *ar, int index);
+int array_delete(array *ar, int index);
