@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -87,5 +88,5 @@ int array_delete(array *ar, int index)
 
 int array_empty(array *ar)
 {
-    return ar->length == 0 && ar->items == NULL;
+    return ar->items == NULL;
 }
