@@ -32,6 +32,16 @@ void hashmap_free(hashmap *hm)
     free(hm);
 }
 
+uint32_t hashmap_len(hashmap *hm)
+{
+    return hm->count;
+}
+
+array *hashmap_values(hashmap *hm)
+{
+    return hm->values;
+}
+
 int hashmap_set(hashmap *hm, char *key, int value)
 {
     int result;

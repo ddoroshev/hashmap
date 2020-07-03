@@ -19,8 +19,8 @@ void test_hashmap_init(void)
 {
     hashmap *hm = hashmap_init();
 
-    ASSERT(hm->count == 0);
-    ASSERT(array_len(hm->values) == HASHMAP_BASE_SIZE);
+    ASSERT(hashmap_len(hm) == 0);
+    ASSERT(array_len(hashmap_values(hm)) == HASHMAP_BASE_SIZE);
 
     hashmap_free(hm);
 }
@@ -36,7 +36,7 @@ void test_hashmap_free(void)
 {
     hashmap *hm = hashmap_init();
     hashmap_free(hm);
-    ASSERT(hm->values == NULL);
+    ASSERT(hashmap_values(hm) == NULL);
 }
 
 void test_hashmap_dump(void)
@@ -59,11 +59,11 @@ void test_hashmap_set(void)
     WITH_SUCCESS_ALLOCS(0, ASSERT(hashmap_set(hm, "ab", val) == -E_HASHMAP_CANNOT_SET_VALUE));
     for (int i = 0; i < HASHMAP_BASE_SIZE; i++) {
         ASSERT(hashmap_set(hm, keys[i], val) == 0);
-        ASSERT(hm->count == i + 1);
+        ASSERT(hashmap_len(hm) == i + 1);
     }
     ASSERT(hashmap_set(hm, "foo", val) == 0);
-    ASSERT(hm->count == 9);
-    ASSERT(array_len(hm->values) == 18);
+    ASSERT(hashmap_len(hm) == 9);
+    ASSERT(array_len(hashmap_values(hm)) == 18);
 
     hashmap_free(hm);
 }
@@ -97,7 +97,7 @@ void test_hashmap_delete(void)
     for (i = 0; i < 3; i++) {
         ASSERT(hashmap_delete(hm, keys[i]) == 0);
     }
-    ASSERT(hm->count == 0);
+    ASSERT(hashmap_len(hm) == 0);
     ASSERT(hashmap_delete(hm, "bar") == -E_HASHMAP_KEY_NOT_FOUND);
 
     hashmap_free(hm);

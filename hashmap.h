@@ -23,8 +23,11 @@ typedef struct {
 
 hashmap *hashmap_init();
 void hashmap_free(hashmap *hm);
+uint32_t hashmap_len(hashmap *hm);
 int hashmap_ensure_size(hashmap *hm);
 int hashmap_resize(hashmap *hm);
+
+array *hashmap_values(hashmap *hm);
 
 int hashmap_set(hashmap*, char *key, int value);
 hashmap_item *hashmap_get(hashmap *hm, char *key);
