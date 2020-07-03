@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "array.h"
-#include "hashmap.h"
-#include "hashmap_item.h"
+#include "array/array.h"
+#include "hashmap/hashmap.h"
+#include "hashmap/hashmap_item.h"
 
 void array_dump(array *ar)
 {

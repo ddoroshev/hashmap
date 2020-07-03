@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc.h"
-#include "array.h"
+#include "alloc/alloc.h"
+#include "array/array.h"
 #include "hashmap.h"
 
 hashmap *hashmap_init()

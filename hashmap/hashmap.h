@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "array.h"
+#include "array/array.h"
 #include "hashmap_item.h"
 
 #define HASHMAP_BASE_SIZE 8

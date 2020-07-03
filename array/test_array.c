@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc.h"
+#include "alloc/alloc.h"
 #include "array.h"
 #include "dump.h"
-#include "hashmap_item.h"
+#include "hashmap/hashmap_item.h"
 #include "tests/assert.h"
 
 const int item_size = sizeof(hashmap_item);

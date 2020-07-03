@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "alloc.h"
+#include "alloc/alloc.h"
 #include "hashmap.h"
 #include "tests/assert.h"
 

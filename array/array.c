@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc.h"
+#include "alloc/alloc.h"
 #include "array.h"
 
 struct array {
