@@ -20,7 +20,7 @@ test: $(TESTS_TARGET)
 	./bin/tests
 
 cov: CFLAGS += -fprofile-arcs -ftest-coverage
-cov: test
+cov: clean test
 	lcov --directory . --capture --output-file info.cov
 	mkdir -p cov-report
 	genhtml -o cov-report info.cov
@@ -40,4 +40,4 @@ array.o: array/array.h alloc/alloc.h
 dump.o: array/array.h hashmap/hashmap.h hashmap/hashmap_item.h
 
 clean:
-	rm -rf $(REBUILDABLES) $(TESTS_TARGET) *.gc* tests/*.gc* *.cov cov-report
+	rm -rf $(REBUILDABLES) $(TESTS_TARGET) **/*.gc* *.cov cov-report
