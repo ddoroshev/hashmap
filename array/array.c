@@ -12,22 +12,19 @@ struct array {
     void **items;
 };
 
-void array_fill_null(array *ar);
-
 array *array_init(int length, int item_size)
 {
-    array *ar = malloc(sizeof(array));
+    array *ar = calloc(1, sizeof(array));
     if (ar == NULL) {
         return NULL;
     }
-    ar->items = malloc(length * sizeof(void*));
+    ar->items = calloc(length, item_size + sizeof(void*));
     if (ar->items == NULL) {
         free(ar);
         return NULL;
     }
     ar->length = length;
     ar->item_size = item_size;
-    array_fill_null(ar);
     return ar;
 }
 
@@ -36,19 +33,12 @@ int array_len(array *ar)
     return ar->length;
 }
 
-void array_fill_null(array *ar)
-{
-    for (int i = 0; i < ar->length; i++) {
-        ar->items[i] = NULL;
-    }
-}
-
 int array_set(array *ar, int index, void *item)
 {
     if (index < 0 || index >= ar->length) {
         return -E_ARRAY_INDEX_OUT_OF_RANGE;
     }
-    ar->items[index] = malloc(sizeof(void*));
+    ar->items[index] = calloc(1, sizeof(void*));
     if (ar->items[index] == NULL) {
         return -E_ALLOC;
     }

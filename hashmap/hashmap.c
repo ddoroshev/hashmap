@@ -9,7 +9,7 @@
 hashmap *hashmap_init()
 {
     int length = HASHMAP_BASE_SIZE;
-    hashmap *hm = malloc(sizeof(hashmap));
+    hashmap *hm = calloc(1, sizeof(hashmap));
     if (hm == NULL) {
         return NULL;
     }
