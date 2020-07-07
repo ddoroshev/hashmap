@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,13 +7,13 @@
 #include "array.h"
 
 struct array {
-    int length;
-    int item_size;
+    uint32_t length;
+    uint32_t item_size;
 
     void **items;
 };
 
-array *array_init(int length, int item_size)
+array *array_init(uint32_t length, uint32_t item_size)
 {
     array *ar = calloc(1, sizeof(array));
     if (ar == NULL) {
@@ -28,12 +29,12 @@ array *array_init(int length, int item_size)
     return ar;
 }
 
-int array_len(array *ar)
+uint32_t array_len(array *ar)
 {
     return ar->length;
 }
 
-int array_set(array *ar, int index, void *item)
+int array_set(array *ar, uint32_t index, void *item)
 {
     if (index < 0 || index >= ar->length) {
         return -E_ARRAY_INDEX_OUT_OF_RANGE;
@@ -47,9 +48,9 @@ int array_set(array *ar, int index, void *item)
     return 0;
 }
 
-void *array_get(array *ar, int index)
+void *array_get(array *ar, uint32_t index)
 {
-    if (index < 0 || index >= ar->length) {
+    if (index >= ar->length) {
         return NULL;
     }
     return ar->items[index];
@@ -65,9 +66,9 @@ void array_free(array *ar)
     free(ar);
 }
 
-int array_delete(array *ar, int index)
+int array_delete(array *ar, uint32_t index)
 {
-    if (index < 0 || index >= ar->length) {
+    if (index >= ar->length) {
         return -E_ARRAY_INDEX_OUT_OF_RANGE;
     }
     free(ar->items[index]);
