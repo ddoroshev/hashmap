@@ -36,10 +36,10 @@ uint32_t array_len(array *ar)
 
 int array_set(array *ar, uint32_t index, void *item)
 {
-    if (index < 0 || index >= ar->length) {
+    if (index >= ar->length) {
         return -E_ARRAY_INDEX_OUT_OF_RANGE;
     }
-    ar->items[index] = calloc(1, sizeof(void*));
+    ar->items[index] = calloc(1, ar->item_size);
     if (ar->items[index] == NULL) {
         return -E_ALLOC;
     }

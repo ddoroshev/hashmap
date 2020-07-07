@@ -1,0 +1,11 @@
+FROM gcc:4.9
+
+RUN apt-get update && apt-get install valgrind -y
+
+COPY . /usr/src/myapp
+
+WORKDIR /usr/src/myapp
+
+RUN make test-build
+
+CMD ["valgrind", "--leak-check=full", "bin/tests"]

@@ -58,5 +58,9 @@ docker-playground-debug:
 	docker build -t hashmap-playground-debug -f Dockerfile.debug .
 	docker run -it --rm hashmap-playground-debug gdb bin/playground
 
+valgrind:
+	docker build -t hashmap-valgrind -f Dockerfile.valgrind .
+	docker run -it --rm hashmap-valgrind
+
 clean:
 	rm -rf $(REBUILDABLES) $(TESTS_TARGET) **/*.gc* *.cov cov-report
