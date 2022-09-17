@@ -1,4 +1,4 @@
-FROM gcc:4.9
+FROM gcc:12.2
 
 RUN apt-get update && apt-get -y install gdb
 
@@ -6,6 +6,6 @@ COPY . /usr/src/myapp
 
 WORKDIR /usr/src/myapp
 
-RUN make test-build playground
+RUN make CC=gcc test-build playground
 
 CMD ["gdb", "./bin/tests"]

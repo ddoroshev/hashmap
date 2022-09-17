@@ -1,11 +1,11 @@
-FROM gcc:4.9
+FROM gcc:12.2
 
 COPY . /usr/src/myapp
 
 WORKDIR /usr/src/myapp
 
-RUN make test
+RUN make CC=gcc test
 
-RUN make
+RUN make CC=gcc
 
 CMD ["./bin/main"]
