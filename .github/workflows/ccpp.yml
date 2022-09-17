@@ -8,6 +8,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: make
-      run: make
+      run: make CXX=g++
     - name: make test
-      run: make test
+      run: make CXX=g++ test
