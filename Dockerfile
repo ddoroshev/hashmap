@@ -1,4 +1,4 @@
-FROM gcc:4.9
+FROM gcc:13.2
 
 COPY . /usr/src/myapp
 

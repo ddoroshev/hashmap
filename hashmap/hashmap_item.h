@@ -1,6 +1,6 @@
 #pragma once
 
 typedef struct {
-    char *key;
+    const char *key;
     int value;
 } hashmap_item;

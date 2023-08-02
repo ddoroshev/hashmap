@@ -35,13 +35,13 @@ void test_array_dump(void)
     array_set(ar, 2, &(hashmap_item){"cd", 3});
 
     array_dump(ar);
+    array_free(ar);
 }
 
 void test_array_free(void)
 {
     array *ar = array_init(3, item_size);
     array_free(ar);
-    ASSERT(array_empty(ar) == 1);
 }
 
 void test_array_set(void)

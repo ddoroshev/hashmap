@@ -39,6 +39,9 @@ int array_set(array *ar, uint32_t index, void *item)
     if (index >= ar->length) {
         return -E_ARRAY_INDEX_OUT_OF_RANGE;
     }
+    if(ar->items[index] != NULL) {
+        free(ar->items[index]);
+    }
     ar->items[index] = calloc(1, ar->item_size);
     if (ar->items[index] == NULL) {
         return -E_ALLOC;

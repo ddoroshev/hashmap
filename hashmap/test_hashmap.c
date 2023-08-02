@@ -28,16 +28,15 @@ void test_hashmap_init(void)
 
 void test_hashmap_init_fail(void)
 {
-    WITH_SUCCESS_ALLOCS(0, ASSERT(hashmap_init(1) == NULL));
-    WITH_SUCCESS_ALLOCS(1, ASSERT(hashmap_init(1) == NULL));
-    WITH_SUCCESS_ALLOCS(2, ASSERT(hashmap_init(1) == NULL));
+    WITH_SUCCESS_ALLOCS(0, ASSERT(hashmap_init() == NULL));
+    WITH_SUCCESS_ALLOCS(1, ASSERT(hashmap_init() == NULL));
+    WITH_SUCCESS_ALLOCS(2, ASSERT(hashmap_init() == NULL));
 }
 
 void test_hashmap_free(void)
 {
     hashmap *hm = hashmap_init();
     hashmap_free(hm);
-    ASSERT(hashmap_values(hm) == NULL);
 }
 
 void test_hashmap_dump(void)
@@ -121,4 +120,21 @@ void test_hashmap_find_index(void)
     ASSERT(_hashmap_find_index(hm, "foo") == -E_HASHMAP_KEY_NOT_FOUND);
 
     hashmap_free(hm);
+}
+
+
+void test_hashmap_key_memory_management(void)
+{
+    hashmap *hm = hashmap_init();
+    char *key = malloc(3);
+    strcpy(key, "ab");
+    hashmap_set(hm, key, 1);
+
+    strcpy(key, "cd");  // Change the original key
+    hashmap_item *item = hashmap_get(hm, "ab");
+    ASSERT(item != NULL);
+    ASSERT(strcmp(item->key, "ab") == 0);  // The stored key should not be affected
+
+    hashmap_free(hm);
+    free(key);
 }

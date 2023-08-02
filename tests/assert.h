@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-short __has_errors;
+static short __has_errors;
 
 #define ASSERT(chk) \
     if (!(chk)) { \

@@ -19,5 +19,6 @@ int main(void)
     test_hashmap_delete();
     test_hashmap_find_index();
 
+    test_hashmap_key_memory_management();
     FIN;
 }
