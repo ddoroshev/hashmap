@@ -4,7 +4,7 @@ TESTS_TARGET = ./bin/tests
 PLAYGROUND_TARGET = ./bin/playground
 
 CC = gcc
-CFLAGS = -I. -Wall -std=c11
+CFLAGS = -I. -Wall -std=gnu11
 
 OBJS = alloc/alloc.o array/array.o hashmap/hashmap.o dump.o
 TEST_OBJS = array/test_array.o hashmap/test_hashmap.o tests/test.o
