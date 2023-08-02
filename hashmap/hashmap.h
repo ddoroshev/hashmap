@@ -2,8 +2,21 @@
 
 #include <stdint.h>
 
-#include "array/array.h"
 #include "hashmap_item.h"
+
+#define E_ARRAY_INDEX_OUT_OF_RANGE 1
+#define E_ALLOC 2
+
+typedef struct array {
+    uint32_t length;
+    uint32_t item_size;
+
+    void **items;
+} array;
+
+array *array_init(uint32_t length, uint32_t item_size);
+int array_set(array *ar, uint32_t index, void *item);
+void array_free(array *ar);
 
 #define HASHMAP_BASE_SIZE 8
 
@@ -33,7 +46,7 @@ int hashmap_set(hashmap*, char *key, int value);
 hashmap_item *hashmap_get(hashmap *hm, char *key);
 int hashmap_delete(hashmap *hm, char *key);
 
-int _hashmap_find_index(hashmap *hm, char *key);
-int _hashmap_find_empty_index(hashmap *hm, char *key);
+int _hashmap_find_index(hashmap *hm, char *key, unsigned long hash);
+int _hashmap_find_empty_index(hashmap *hm, unsigned long hash);
 
 unsigned long hash(char *s);

@@ -2,7 +2,7 @@
 #include <time.h>
 #include "hashmap/hashmap.h"
 
-#define SIZE 80000
+#define SIZE 5000000
 
 void benchmark_insert(hashmap *map) {
     clock_t start, end;
@@ -14,6 +14,9 @@ void benchmark_insert(hashmap *map) {
         char key[20];
         sprintf(key, "key%d", i);
         hashmap_set(map, key, i);
+        if (i % 50000 == 0) {
+            printf("%d\n", i);
+        }
     }
 
     end = clock();
@@ -31,7 +34,13 @@ void benchmark_search(hashmap *map) {
     for (int i = 0; i < SIZE; i++) {
         char key[20];
         sprintf(key, "key%d", i);
-        hashmap_get(map, key);
+        hashmap_item *item = hashmap_get(map, key);
+        if (item->value != i) {
+            printf("Error! %d != %d\n", item->value, i);
+        }
+        if (i % 50000 == 0) {
+            printf("%d\n", i);
+        }
     }
 
     end = clock();
@@ -49,7 +58,10 @@ void benchmark_delete(hashmap *map) {
     for (int i = 0; i < SIZE; i++) {
         char key[20];
         sprintf(key, "key%d", i);
-        hashmap_delete(map, key);
+        int res = hashmap_delete(map, key);
+        if (res != 0) {
+            printf("Error deleting %s\n", key);
+        }
     }
 
     end = clock();
@@ -61,8 +73,11 @@ void benchmark_delete(hashmap *map) {
 int main() {
     hashmap *map = hashmap_init();
     benchmark_insert(map);
+    benchmark_insert(map);
     benchmark_search(map);
     benchmark_delete(map);
+
+    hashmap_free(map);
 
     return 0;
 }

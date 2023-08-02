@@ -5,19 +5,27 @@ PLAYGROUND_TARGET = ./bin/playground
 BENCHMARK_TARGET = ./bin/benchmark
 
 CC = gcc
-CFLAGS = -I. -Wall -std=gnu11
+CFLAGS = -I. -Wall -std=gnu11 -fno-omit-frame-pointer
+LDFLAGS =
 
-OBJS = alloc/alloc.o array/array.o hashmap/hashmap.o dump.o
-TEST_OBJS = array/test_array.o hashmap/test_hashmap.o tests/test.o
+OBJS = alloc/alloc.o hashmap/hashmap.o dump.o
+TEST_OBJS = hashmap/test_hashmap.o tests/test.o
 MAIN_OBJS = main.o
 PLAYGROUND_OBJS = playground.o
 BENCHMARK_OBJS = benchmark.o $(OBJS)
+
 REBUILDABLES = $(OBJS) $(MAIN_OBJS) $(TEST_OBJS) $(PLAYGROUND_OBJS) $(BENCHMARK_OBJS) $(TARGET)
+
+RELEASE_TARGET = $(TARGET)_release
+RELEASE_BENCHMARK = $(BENCHMARK_TARGET)_release
+
+RELEASE_CFLAGS = $(CFLAGS) -O3 -DNDEBUG
+RELEASE_LDFLAGS = $(LDFLAGS)
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS) $(MAIN_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 test-build: CFLAGS += -Wno-implicit-function-declaration -g
 test-build: $(TESTS_TARGET)
@@ -35,22 +43,32 @@ $(TESTS_TARGET): $(TEST_OBJS) $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(PLAYGROUND_TARGET): $(PLAYGROUND_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 $(BENCHMARK_TARGET): $(BENCHMARK_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+release: CFLAGS := $(RELEASE_CFLAGS)
+release: LDFLAGS := $(RELEASE_LDFLAGS)
+release: clean $(RELEASE_TARGET) $(RELEASE_BENCHMARK)
+
+$(RELEASE_TARGET): $(OBJS) $(MAIN_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	strip $@
+
+$(RELEASE_BENCHMARK): $(BENCHMARK_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	strip $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 tests/test.o: tests/assert.h
-array/test_array.o: array/array.h alloc/alloc.h hashmap/hashmap_item.h tests/assert.h
 hashmap/test_hashmap.o: hashmap/hashmap.h alloc/alloc.h hashmap/hashmap_item.h tests/assert.h
-main.o: hashmap/hashmap.h array/array.h alloc/alloc.h hashmap/hashmap_item.h
-hashmap.o: hashmap/hashmap.h array/array.h alloc/alloc.h hashmap/hashmap_item.h
-array.o: array/array.h alloc/alloc.h
-dump.o: array/array.h hashmap/hashmap.h hashmap/hashmap_item.h
-benchmark.o: array/array.h hashmap/hashmap.h hashmap/hashmap_item.h
+main.o: hashmap/hashmap.h alloc/alloc.h hashmap/hashmap_item.h
+hashmap.o: hashmap/hashmap.h alloc/alloc.h hashmap/hashmap_item.h
+dump.o: hashmap/hashmap.h hashmap/hashmap_item.h
+benchmark.o: hashmap/hashmap.h hashmap/hashmap_item.h
 
 playground: CFLAGS += -g
 playground: $(PLAYGROUND_TARGET)
@@ -73,4 +91,4 @@ valgrind:
 	docker run -it --rm hashmap-valgrind
 
 clean:
-	rm -rf $(REBUILDABLES) $(TESTS_TARGET) **/*.gc* *.cov cov-report
+	rm -rf $(REBUILDABLES) $(TESTS_TARGET) $(RELEASE_TARGET) $(RELEASE_BENCHMARK) **/*.gc* *.cov cov-report

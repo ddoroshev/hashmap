@@ -1,10 +1,54 @@
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "alloc/alloc.h"
-#include "array/array.h"
 #include "hashmap.h"
+
+
+array *array_init(uint32_t length, uint32_t item_size)
+{
+    array *ar = calloc(1, sizeof(array));
+    if (ar == NULL) {
+        return NULL;
+    }
+    ar->items = calloc(length, item_size + sizeof(void*));
+    if (ar->items == NULL) {
+        free(ar);
+        return NULL;
+    }
+    ar->length = length;
+    ar->item_size = item_size;
+    return ar;
+}
+
+int array_set(array *ar, uint32_t index, void *item)
+{
+    if (index >= ar->length) {
+        return -E_ARRAY_INDEX_OUT_OF_RANGE;
+    }
+    if(ar->items[index] != NULL) {
+        free(ar->items[index]);
+    }
+    ar->items[index] = calloc(1, ar->item_size);
+    if (ar->items[index] == NULL) {
+        return -E_ALLOC;
+    }
+    memcpy(ar->items[index], item, ar->item_size);
+
+    return 0;
+}
+
+void array_free(array *ar)
+{
+    for (int i = ar->length - 1; i >= 0; i--) {
+        free(ar->items[i]);
+    }
+    free(ar->items);
+    ar->items = NULL;
+    free(ar);
+}
 
 hashmap *hashmap_init()
 {
@@ -27,8 +71,8 @@ hashmap *hashmap_init()
 void hashmap_free(hashmap *hm)
 {
     hashmap_item *item;
-    for (int i = 0; i < array_len(hm->values); i++) {
-        item = array_get(hm->values, i);
+    for (int i = 0; i < hm->values->length; i++) {
+        item = hm->values->items[i];
         if (item != NULL) {
             free(item->key);
         }
@@ -52,34 +96,48 @@ array *hashmap_values(hashmap *hm)
 int hashmap_set(hashmap *hm, char *key, int value)
 {
     int result;
-    char *key_copy = strdup(key);
-    if (key_copy == NULL) {
-        return -E_HASHMAP_CANNOT_SET_VALUE;
-    }
+    int is_new_key = 0;
 
     if ((result = hashmap_ensure_size(hm)) != 0) {
-        free(key_copy);
         return result;
     }
 
-    int index = _hashmap_find_empty_index(hm, key_copy);
+    unsigned long h = hash(key);
+    int index = _hashmap_find_index(hm, key, h);
     if (index == -E_HASHMAP_KEY_NOT_FOUND) {
-        free(key_copy);
+        is_new_key = 1;
+        index = _hashmap_find_empty_index(hm, h);
+    }
+    if (index == -E_HASHMAP_KEY_NOT_FOUND) {
         return -E_HASHMAP_FULL;
     }
-    if (array_set(hm->values, index, &(hashmap_item){key_copy, value}) != 0) {
-        free(key_copy);
-        return -E_HASHMAP_CANNOT_SET_VALUE;
+
+    if (is_new_key) {
+        char *key_copy = strdup(key);
+        if (key_copy == NULL) {
+            return -E_HASHMAP_CANNOT_SET_VALUE;
+        }
+        if (array_set(hm->values, index, &(hashmap_item){key_copy, value, 0, h}) != 0) {
+            free(key_copy);
+            return -E_HASHMAP_CANNOT_SET_VALUE;
+        }
+    } else {
+        hashmap_item *item = hm->values->items[index];
+        item->value = value;
     }
-    hm->count++;
+
+    if (is_new_key) {
+        hm->count++;
+    }
 
     return 0;
 }
 
+
 int hashmap_ensure_size(hashmap *hm)
 {
     int result;
-    if (hm->count >= USABLE_FRACTION(array_len(hm->values))) {
+    if (hm->count >= USABLE_FRACTION(hm->values->length)) {
         result = hashmap_resize(hm);
         if (result != 0) {
             return result;
@@ -90,43 +148,45 @@ int hashmap_ensure_size(hashmap *hm)
 
 int hashmap_resize(hashmap *hm)
 {
-    int result;
     hashmap_item *item;
     array *old_values = hm->values;
-    int new_length = ESTIMATE_SIZE(array_len(hm->values));
+    uint32_t old_len = hm->values->length;
+    int new_length = ESTIMATE_SIZE(old_len);
     hm->count = 0;
     hm->values = array_init(new_length, sizeof(hashmap_item));
     if (hm->values == NULL) {
         return -E_ALLOC;
     }
 
-    for (int i = 0; i < array_len(old_values); i++) {
-        item = array_get(old_values, i);
-        if (item == NULL) {
+    for (int i = 0; i < old_len; i++) {
+        item = old_values->items[i];
+        if (item == NULL || item->is_deleted == 1) {
             continue;
         }
-        result = hashmap_set(hm, item->key, item->value);
-        if (result != 0) {
+
+        int index = _hashmap_find_empty_index(hm, item->hash);
+        if (index == -E_HASHMAP_KEY_NOT_FOUND) {
             array_free(hm->values);
             hm->values = old_values;
-            return result;
+            return index;
         }
-        free(item->key);
+        hm->values->items[index] = item;
+        hm->count++;
     }
-    array_free(old_values);
+    free(old_values->items);
+    free(old_values);
     return 0;
 }
 
 int hashmap_delete(hashmap *hm, char *key)
 {
-    int index = _hashmap_find_index(hm, key);
+    int index = _hashmap_find_index(hm, key, hash(key));
     if (index < 0) {
         return index;
     }
 
-    hashmap_item *item = array_get(hm->values, index);
-    free(item->key);
-    array_delete(hm->values, index);
+    hashmap_item *item = hm->values->items[index];
+    item->is_deleted = 1;
     hm->count--;
 
     return 0;
@@ -134,56 +194,50 @@ int hashmap_delete(hashmap *hm, char *key)
 
 hashmap_item *hashmap_get(hashmap *hm, char *key)
 {
-    int index = _hashmap_find_index(hm, key);
+    int index = _hashmap_find_index(hm, key, hash(key));
     if (index == -E_HASHMAP_KEY_NOT_FOUND) {
         return NULL;
     }
-    return array_get(hm->values, index);
+    return hm->values->items[index];
 }
 
-int _hashmap_find_index(hashmap *hm, char *key)
+int _hashmap_find_index(hashmap *hm, char *key, unsigned long hash)
 {
-    unsigned long h = hash(key);
-    int init_index = (int)(h & (array_len(hm->values) - 1));
-    int index = init_index;
-
-    for (;;) {
-        hashmap_item *item = array_get(hm->values, index);
+    uint32_t len = hm->values->length;
+    int index = (int)(hash & (len - 1));
+    unsigned long perturb = hash;
+    for (;; perturb >>= 5) {
+        hashmap_item *item = hm->values->items[index];
         if (item == NULL) {
             break;
         }
-        if (strcmp(item->key, key) == 0) {
+        if (item->is_deleted == 0 && item->hash == hash && strcmp(item->key, key) == 0) {
             return index;
         }
-        index++;
-        if (index == array_len(hm->values)) {
+        index = ((index << 2) + index + perturb + 1) % len;
+        if (index == len) {
             index = 0;
-        }
-        if (index == init_index) {
-            break;
         }
     }
 
     return -E_HASHMAP_KEY_NOT_FOUND;
 }
 
-int _hashmap_find_empty_index(hashmap *hm, char *key)
+int _hashmap_find_empty_index(hashmap *hm, unsigned long hash)
 {
-    unsigned long h = hash(key);
-    int init_index = (int)(h & (array_len(hm->values) - 1));
-    int index = init_index;
+    uint32_t len = hm->values->length;
+    int index = (int)(hash & (len - 1));
+    hashmap_item *item;
+    unsigned long perturb = hash;
 
-    for (;;) {
-        hashmap_item *item = array_get(hm->values, index);
-        if (item == NULL) {
+    for (;; perturb >>= 5) {
+        item = hm->values->items[index];
+        if (item == NULL || item->is_deleted == 1) {
             return index;
         }
-        index++;
-        if (index == array_len(hm->values)) {
+        index = ((index << 2) + index + perturb + 1) % len;
+        if (index == len) {
             index = 0;
-        }
-        if (index == init_index) {
-            break;
         }
     }
 
