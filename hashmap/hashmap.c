@@ -49,7 +49,7 @@ array *hashmap_values(hashmap *hm)
     return hm->values;
 }
 
-int hashmap_set(hashmap *hm, const char *key, int value)
+int hashmap_set(hashmap *hm, char *key, int value)
 {
     int result;
     char *key_copy = strdup(key);
@@ -117,7 +117,7 @@ int hashmap_resize(hashmap *hm)
     return 0;
 }
 
-int hashmap_delete(hashmap *hm, const char *key)
+int hashmap_delete(hashmap *hm, char *key)
 {
     int index = _hashmap_find_index(hm, key);
     if (index < 0) {
@@ -132,7 +132,7 @@ int hashmap_delete(hashmap *hm, const char *key)
     return 0;
 }
 
-hashmap_item *hashmap_get(hashmap *hm, const char *key)
+hashmap_item *hashmap_get(hashmap *hm, char *key)
 {
     int index = _hashmap_find_index(hm, key);
     if (index == -E_HASHMAP_KEY_NOT_FOUND) {
@@ -141,7 +141,7 @@ hashmap_item *hashmap_get(hashmap *hm, const char *key)
     return array_get(hm->values, index);
 }
 
-int _hashmap_find_index(hashmap *hm, const char *key)
+int _hashmap_find_index(hashmap *hm, char *key)
 {
     unsigned long h = hash(key);
     int init_index = (int)(h & (array_len(hm->values) - 1));
@@ -167,7 +167,7 @@ int _hashmap_find_index(hashmap *hm, const char *key)
     return -E_HASHMAP_KEY_NOT_FOUND;
 }
 
-int _hashmap_find_empty_index(hashmap *hm, const char *key)
+int _hashmap_find_empty_index(hashmap *hm, char *key)
 {
     unsigned long h = hash(key);
     int init_index = (int)(h & (array_len(hm->values) - 1));
@@ -190,7 +190,7 @@ int _hashmap_find_empty_index(hashmap *hm, const char *key)
     return -E_HASHMAP_KEY_NOT_FOUND;
 }
 
-unsigned long hash(const char *s)
+unsigned long hash(char *s)
 {
     unsigned long hash = 5381;
     int c;

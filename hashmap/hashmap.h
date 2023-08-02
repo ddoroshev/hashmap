@@ -29,11 +29,11 @@ int hashmap_resize(hashmap *hm);
 
 array *hashmap_values(hashmap *hm);
 
-int hashmap_set(hashmap*, const char *key, int value);
-hashmap_item *hashmap_get(hashmap *hm, const char *key);
-int hashmap_delete(hashmap *hm, const char *key);
+int hashmap_set(hashmap*, char *key, int value);
+hashmap_item *hashmap_get(hashmap *hm, char *key);
+int hashmap_delete(hashmap *hm, char *key);
 
-int _hashmap_find_index(hashmap *hm, const char *key);
-int _hashmap_find_empty_index(hashmap *hm, const char *key);
+int _hashmap_find_index(hashmap *hm, char *key);
+int _hashmap_find_empty_index(hashmap *hm, char *key);
 
-unsigned long hash(const char *s);
+unsigned long hash(char *s);
