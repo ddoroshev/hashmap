@@ -8,8 +8,8 @@ CC = gcc
 CFLAGS = -I. -Wall -std=gnu11 -fno-omit-frame-pointer
 LDFLAGS =
 
-OBJS = alloc/alloc.o hashmap/hashmap.o dump.o
-TEST_OBJS = hashmap/test_hashmap.o tests/test.o
+OBJS = alloc.o hashmap.o dump.o
+TEST_OBJS = test_hashmap.o test.o
 MAIN_OBJS = main.o
 PLAYGROUND_OBJS = playground.o
 BENCHMARK_OBJS = benchmark.o $(OBJS)
@@ -63,12 +63,12 @@ $(RELEASE_BENCHMARK): $(BENCHMARK_OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-tests/test.o: tests/assert.h
-hashmap/test_hashmap.o: hashmap/hashmap.h alloc/alloc.h hashmap/hashmap_item.h tests/assert.h
-main.o: hashmap/hashmap.h alloc/alloc.h hashmap/hashmap_item.h
-hashmap.o: hashmap/hashmap.h alloc/alloc.h hashmap/hashmap_item.h
-dump.o: hashmap/hashmap.h hashmap/hashmap_item.h
-benchmark.o: hashmap/hashmap.h hashmap/hashmap_item.h
+test.o: assert.h
+test_hashmap.o: hashmap.h alloc.h hashmap_item.h assert.h
+main.o: hashmap.h alloc.h hashmap_item.h
+hashmap.o: hashmap.h alloc.h hashmap_item.h
+dump.o: hashmap.h hashmap_item.h
+benchmark.o: hashmap.h hashmap_item.h
 
 playground: CFLAGS += -g
 playground: $(PLAYGROUND_TARGET)
@@ -79,15 +79,15 @@ benchmark: $(BENCHMARK_TARGET)
 	./bin/benchmark
 
 docker-test-debug:
-	docker build -t hashmap-test-debug -f Dockerfile.debug .
+	docker build -t hashmap-test-debug -f docker/Dockerfile.debug .
 	docker run -it --rm hashmap-test-debug
 
 docker-playground-debug:
-	docker build -t hashmap-playground-debug -f Dockerfile.debug .
+	docker build -t hashmap-playground-debug -f docker/Dockerfile.debug .
 	docker run -it --rm hashmap-playground-debug gdb bin/playground
 
 valgrind:
-	docker build -t hashmap-valgrind -f Dockerfile.valgrind .
+	docker build -t hashmap-valgrind -f docker/Dockerfile.valgrind .
 	docker run -it --rm hashmap-valgrind
 
 clean:

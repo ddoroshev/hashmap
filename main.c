@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "dump.h"
-#include "hashmap/hashmap.h"
+#include "hashmap.h"
 
 int main(void)
 {

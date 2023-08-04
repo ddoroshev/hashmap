@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc/alloc.h"
+#include "alloc.h"
 #include "hashmap.h"
 
 

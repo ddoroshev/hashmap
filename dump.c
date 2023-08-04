@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "hashmap/hashmap.h"
-#include "hashmap/hashmap_item.h"
+#include "hashmap.h"
+#include "hashmap_item.h"
 
 void hashmap_dump(hashmap *hm)
 {

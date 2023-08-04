@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <time.h>
-#include "hashmap/hashmap.h"
+#include "hashmap.h"
 
 #define SIZE 5000000
 

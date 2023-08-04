@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc/alloc.h"
+#include "alloc.h"
 #include "hashmap.h"
-#include "tests/assert.h"
+#include "assert.h"
 
 char *keys[] = {
     "ab",  // 5863208 -> 0
