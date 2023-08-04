@@ -8,7 +8,7 @@ CC = gcc
 CFLAGS = -I. -Wall -std=gnu11 -fno-omit-frame-pointer
 LDFLAGS =
 
-OBJS = alloc.o hashmap.o dump.o
+OBJS = alloc.o array.o hashmap.o dump.o
 TEST_OBJS = test_hashmap.o test.o
 MAIN_OBJS = main.o
 PLAYGROUND_OBJS = playground.o
@@ -64,11 +64,12 @@ $(RELEASE_BENCHMARK): $(BENCHMARK_OBJS)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 test.o: assert.h
-test_hashmap.o: hashmap.h alloc.h hashmap_item.h assert.h
-main.o: hashmap.h alloc.h hashmap_item.h
-hashmap.o: hashmap.h alloc.h hashmap_item.h
-dump.o: hashmap.h hashmap_item.h
-benchmark.o: hashmap.h hashmap_item.h
+test_hashmap.o: hashmap.h alloc.h assert.h array.h
+main.o: hashmap.h alloc.h array.h
+array.o: alloc.h array.h
+hashmap.o: hashmap.h alloc.h array.h
+dump.o: hashmap.h array.h
+benchmark.o: hashmap.h array.h
 
 playground: CFLAGS += -g
 playground: $(PLAYGROUND_TARGET)

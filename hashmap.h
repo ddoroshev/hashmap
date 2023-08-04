@@ -2,21 +2,7 @@
 
 #include <stdint.h>
 
-#include "hashmap_item.h"
-
-#define E_ARRAY_INDEX_OUT_OF_RANGE 1
-#define E_ALLOC 2
-
-typedef struct array {
-    uint32_t length;
-    uint32_t item_size;
-
-    void **items;
-} array;
-
-array *array_init(uint32_t length, uint32_t item_size);
-int array_set(array *ar, uint32_t index, void *item);
-void array_free(array *ar);
+#include "array.h"
 
 #define HASHMAP_BASE_SIZE 8
 
@@ -28,6 +14,13 @@ void array_free(array *ar);
 #define E_HASHMAP_FULL 2
 #define E_HASHMAP_CANNOT_SET_VALUE 3
 #define E_HASHMAP_CANNOT_RESIZE 4
+
+typedef struct {
+    char *key;
+    int value;
+    int is_deleted;
+    unsigned long hash;
+} hashmap_item;
 
 typedef struct {
     uint32_t count;
