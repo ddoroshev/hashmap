@@ -6,7 +6,7 @@
 #include "hashmap.h"
 
 #define SIZE 5000000
-#define REPORT_FREQUENCY 50000
+#define REPORT_FREQUENCY 10
 
 struct rusage r;
 
@@ -154,18 +154,46 @@ long get_peak_memory() {
     return r.ru_maxrss;
 }
 
+void memory_report(long mem_before, long mem_after) {
+    double mem_before_kb = mem_before / 1024.0;
+    double mem_after_kb = mem_after / 1024.0;
+    printf("Memory usage before: %.2f KB, after: %.2f KB, growth: %.2f KB\n", mem_before_kb, mem_after_kb, mem_after_kb - mem_before_kb);
+}
+
 int main() {
     long mem_before, mem_after;
-    mem_before = get_peak_memory();
-
     hashmap *map;
+
+    mem_before = get_peak_memory();
     benchmark_init(&map);
-    benchmark_insert(map);
-    benchmark_search(map);
-    benchmark_delete(map);
-    benchmark_mixed_workload(map);
-    benchmark_free(map);
     mem_after = get_peak_memory();
-    printf("Memory usage before: %ld, after: %ld, growth: %ld\n", mem_before, mem_after, mem_after - mem_before);
+    memory_report(mem_before, mem_after);
+
+    // mem_before = get_peak_memory();
+    // benchmark_insert(map);
+    // mem_after = get_peak_memory();
+    // memory_report(mem_before, mem_after);
+
+    // mem_before = get_peak_memory();
+    // benchmark_search(map);
+    // mem_after = get_peak_memory();
+    // memory_report(mem_before, mem_after);
+
+    // mem_before = get_peak_memory();
+    // benchmark_delete(map);
+    // mem_after = get_peak_memory();
+    // memory_report(mem_before, mem_after);
+
+    // mem_before = get_peak_memory();
+    // benchmark_free(map);
+    // mem_after = get_peak_memory();
+
+    // map = hashmap_init();
+    mem_before = get_peak_memory();
+    benchmark_mixed_workload(map);
+    mem_after = get_peak_memory();
+    memory_report(mem_before, mem_after);
+
+    hashmap_free(map);
     return 0;
 }
