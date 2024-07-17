@@ -63,13 +63,7 @@ $(RELEASE_BENCHMARK): $(BENCHMARK_OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-test.o: assert.h
-test_hashmap.o: hashmap.h alloc.h assert.h array.h
-main.o: hashmap.h alloc.h array.h
-array.o: alloc.h array.h
-hashmap.o: hashmap.h alloc.h array.h
-dump.o: hashmap.h array.h
-benchmark.o: hashmap.h array.h
+*.o: *.h
 
 playground: CFLAGS += -g
 playground: $(PLAYGROUND_TARGET)
@@ -92,4 +86,4 @@ valgrind:
 	docker run -it --rm hashmap-valgrind
 
 clean:
-	rm -rf $(REBUILDABLES) $(TESTS_TARGET) $(RELEASE_TARGET) $(RELEASE_BENCHMARK) **/*.gc* *.cov cov-report
+	rm -rf $(REBUILDABLES) $(TESTS_TARGET) $(RELEASE_TARGET) $(RELEASE_BENCHMARK) **.gc* *.cov cov-report
