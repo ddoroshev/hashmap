@@ -107,7 +107,11 @@ int hashmap_resize(hashmap *hm)
     hashmap_item *item;
     array *old_values = hm->values;
     uint32_t old_len = hm->values->length;
-    int new_length = ESTIMATE_SIZE(old_len);
+    int est_size = ESTIMATE_SIZE(old_len);
+    int new_length = HASHMAP_BASE_SIZE;
+    while (new_length <= est_size && new_length > 0) {
+        new_length <<= 1;
+    }
     hm->count = 0;
     hm->values = array_init(new_length, sizeof(hashmap_item));
     if (hm->values == NULL) {

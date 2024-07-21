@@ -10,6 +10,8 @@
 
 struct rusage r;
 
+char *keys;
+
 void benchmark_init(hashmap **map) {
     clock_t start, end;
     double cpu_time_used;
@@ -31,18 +33,14 @@ void benchmark_insert(hashmap *map) {
     start = clock();
 
     for (int i = 0; i < SIZE; i++) {
-        char *key = malloc(20 * sizeof(char));
-        sprintf(key, "key%d", i);
-        hashmap_set(map, key, i);
+        hashmap_set(map, &keys[i * 20], i);
         if (i % REPORT_FREQUENCY == 0) {
             printf("Inserted %d items\n", i);
         }
-        free(key);
     }
 
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-
     printf("Insertion benchmark completed. Time taken: %.5f seconds\n", cpu_time_used);
 }
 
@@ -51,11 +49,8 @@ void benchmark_search(hashmap *map) {
     double cpu_time_used;
 
     start = clock();
-
     for (int i = 0; i < SIZE; i++) {
-        char key[20];
-        sprintf(key, "key%d", i);
-        hashmap_item *item = hashmap_get(map, key);
+        hashmap_item *item = hashmap_get(map, &keys[i * 20]);
         if (item->value != i) {
             printf("Error! %d != %d\n", item->value, i);
         }
@@ -66,7 +61,6 @@ void benchmark_search(hashmap *map) {
 
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-
     printf("Search benchmark completed. Time taken: %.5f seconds\n", cpu_time_used);
 }
 
@@ -76,12 +70,10 @@ void benchmark_delete(hashmap *map) {
 
     start = clock();
 
-    for (int i = 0; i < SIZE; i++) {
-        char key[20];
-        sprintf(key, "key%d", i);
-        int res = hashmap_delete(map, key);
+    for (int i = 0; i < SIZE; i++) {;
+        int res = hashmap_delete(map, &keys[20 * i]);
         if (res != 0) {
-            printf("Error deleting %s\n", key);
+            printf("Error deleting %s\n", &keys[20 * i]);
         }
         if (i % REPORT_FREQUENCY == 0) {
             printf("Deleted %d items\n", i);
@@ -90,7 +82,6 @@ void benchmark_delete(hashmap *map) {
 
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-
     printf("Deletion benchmark completed. Time taken: %.5f seconds\n", cpu_time_used);
 }
 
@@ -115,9 +106,7 @@ void benchmark_mixed_workload(hashmap *map) {
     start = clock();
 
     for (int i = 0; i < SIZE; i++) {
-        char *key = malloc(20 * sizeof(char));
-        sprintf(key, "key%d", i);
-
+        char *key = &keys[i * 20];
         // Insertion
         hashmap_set(map, key, i);
 
@@ -140,7 +129,6 @@ void benchmark_mixed_workload(hashmap *map) {
         if (i % REPORT_FREQUENCY == 0) {
             printf("Processed %d items\n", i);
         }
-        free(key);
     }
 
     end = clock();
@@ -156,6 +144,12 @@ long get_peak_memory() {
 
 int main() {
     long mem_before, mem_after;
+
+    keys = malloc(20 * sizeof(char) * SIZE);
+    for (int i = 0; i < SIZE; i++) {
+        sprintf(&keys[i * 20], "key%d", i);
+    }
+
     mem_before = get_peak_memory();
 
     hashmap *map;
@@ -167,5 +161,6 @@ int main() {
     benchmark_free(map);
     mem_after = get_peak_memory();
     printf("Memory usage before: %ld, after: %ld, growth: %ld\n", mem_before, mem_after, mem_after - mem_before);
+    free(keys);
     return 0;
 }
