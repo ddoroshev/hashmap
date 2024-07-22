@@ -69,8 +69,10 @@ playground: CFLAGS += -g
 playground: $(PLAYGROUND_TARGET)
 	./bin/playground
 
-benchmark: CFLAGS += -g
-benchmark: $(BENCHMARK_TARGET)
+benchmark-build: CFLAGS += -g
+benchmark-build: $(BENCHMARK_TARGET)
+
+benchmark: benchmark-build
 	./bin/benchmark
 
 docker-test-debug:

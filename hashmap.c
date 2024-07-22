@@ -29,7 +29,7 @@ void hashmap_free(hashmap *hm)
     hashmap_item *item;
     for (int i = 0; i < hm->values->length; i++) {
         item = hm->values->items[i];
-        if (item != NULL) {
+        if (item != NULL && item->key != NULL) {
             free(item->key);
         }
     }
@@ -107,11 +107,12 @@ int hashmap_resize(hashmap *hm)
     hashmap_item *item;
     array *old_values = hm->values;
     uint32_t old_len = hm->values->length;
-    int est_size = ESTIMATE_SIZE(old_len);
-    int new_length = HASHMAP_BASE_SIZE;
-    while (new_length <= est_size && new_length > 0) {
-        new_length <<= 1;
-    }
+    uint32_t est_size = ESTIMATE_SIZE(hm);
+    uint32_t new_length = HASHMAP_BASE_SIZE;
+    for (new_length = HASHMAP_BASE_SIZE;
+         new_length <= est_size && new_length > 0;
+         new_length <<= 1);
+
     hm->count = 0;
     hm->values = array_init(new_length, sizeof(hashmap_item));
     if (hm->values == NULL) {
@@ -123,7 +124,6 @@ int hashmap_resize(hashmap *hm)
         if (item == NULL || item->is_deleted == 1) {
             continue;
         }
-
         int index = _hashmap_find_empty_index(hm, item->hash);
         if (index == -E_HASHMAP_KEY_NOT_FOUND) {
             array_free(hm->values);
@@ -132,6 +132,12 @@ int hashmap_resize(hashmap *hm)
         }
         hm->values->items[index] = item;
         hm->count++;
+    }
+    for (int i = 0; i < old_values->length; i++) {
+        item = old_values->items[i];
+        if (item != NULL && item->is_deleted == 1) {
+            free(item);
+        }
     }
     free(old_values->items);
     free(old_values);
@@ -146,6 +152,8 @@ int hashmap_delete(hashmap *hm, char *key)
     }
 
     hashmap_item *item = hm->values->items[index];
+    free(item->key);
+    item->key = NULL;
     item->is_deleted = 1;
     hm->count--;
 
@@ -161,47 +169,37 @@ hashmap_item *hashmap_get(hashmap *hm, char *key)
     return hm->values->items[index];
 }
 
-int _hashmap_find_index(hashmap *hm, char *key, unsigned long hash)
+int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash)
 {
-    uint32_t len = hm->values->length;
-    int index = (int)(hash & (len - 1));
-    unsigned long perturb = hash;
-    for (;; perturb >>= 5) {
-        hashmap_item *item = hm->values->items[index];
+    uint32_t mask = hm->values->length - 1;
+    uint32_t i = hash & mask;
+    uint32_t perturb;
+    hashmap_item *item;
+    for (perturb = hash;; i = mask & (i * 5 + perturb + 1), perturb >>= 5) {
+        item = hm->values->items[i];
         if (item == NULL) {
-            break;
+            return -E_HASHMAP_KEY_NOT_FOUND;
         }
         if (item->is_deleted == 0 && item->hash == hash && strcmp(item->key, key) == 0) {
-            return index;
-        }
-        index = ((index << 2) + index + perturb + 1) % len;
-        if (index == len) {
-            index = 0;
+            return i;
         }
     }
-
-    return -E_HASHMAP_KEY_NOT_FOUND;
 }
 
-int _hashmap_find_empty_index(hashmap *hm, unsigned long hash)
+uint32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash)
 {
-    uint32_t len = hm->values->length;
-    int index = (int)(hash & (len - 1));
+    uint32_t mask = hm->values->length - 1;
+    uint32_t i = hash & mask;
+    uint32_t perturb;
     hashmap_item *item;
-    unsigned long perturb = hash;
-
-    for (;; perturb >>= 5) {
-        item = hm->values->items[index];
+    for (perturb = hash;; i = mask & (i * 5 + perturb + 1), perturb >>= 5) {
+        item = hm->values->items[i];
         if (item == NULL || item->is_deleted == 1) {
-            return index;
-        }
-        index = ((index << 2) + index + perturb + 1) % len;
-        if (index == len) {
-            index = 0;
+            break;
         }
     }
 
-    return -E_HASHMAP_KEY_NOT_FOUND;
+    return i;
 }
 
 unsigned long hash(char *s)

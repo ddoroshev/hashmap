@@ -5,3 +5,7 @@ bin/*
 cov-report
 *.gcda
 *.gcno
+.DS_Store
+FlameGraph
+*.perf
+perf.*

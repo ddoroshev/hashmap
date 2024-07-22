@@ -6,6 +6,6 @@ WORKDIR /usr/src/myapp
 
 COPY . /usr/src/myapp
 
-RUN make test-build
+RUN make benchmark-build
 
-CMD ["valgrind", "--leak-check=full", "bin/tests"]
+CMD ["valgrind", "--leak-check=full", "-s", "bin/benchmark"]

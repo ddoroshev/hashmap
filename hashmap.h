@@ -8,7 +8,7 @@
 
 // From CPython
 #define USABLE_FRACTION(n) (((n) << 1)/3)
-#define ESTIMATE_SIZE(n) (((n)*3+1) >> 1)
+#define ESTIMATE_SIZE(hm) (hm->count*2 + (hm->values->length >> 1))
 
 #define E_HASHMAP_KEY_NOT_FOUND 1
 #define E_HASHMAP_FULL 2
@@ -19,7 +19,7 @@ typedef struct {
     char *key;
     int value;
     int is_deleted;
-    unsigned long hash;
+    uint32_t hash;
 } hashmap_item;
 
 typedef struct {
@@ -39,7 +39,7 @@ int hashmap_set(hashmap*, char *key, int value);
 hashmap_item *hashmap_get(hashmap *hm, char *key);
 int hashmap_delete(hashmap *hm, char *key);
 
-int _hashmap_find_index(hashmap *hm, char *key, unsigned long hash);
-int _hashmap_find_empty_index(hashmap *hm, unsigned long hash);
+int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash);
+uint32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash);
 
 unsigned long hash(char *s);
