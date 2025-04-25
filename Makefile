@@ -8,10 +8,10 @@ CC = gcc
 CFLAGS = -I. -Wall -std=gnu11 -fno-omit-frame-pointer
 LDFLAGS =
 
-OBJS = alloc.o array.o hashmap.o dump.o
+OBJS = alloc.o hashmap.o dump.o
 TEST_OBJS = test_hashmap.o test.o
 MAIN_OBJS = main.o
-PLAYGROUND_OBJS = playground.o
+PLAYGROUND_OBJS = playground.o $(OBJS)
 BENCHMARK_OBJS = benchmark.o $(OBJS)
 
 REBUILDABLES = $(OBJS) $(MAIN_OBJS) $(TEST_OBJS) $(PLAYGROUND_OBJS) $(BENCHMARK_OBJS) $(TARGET)

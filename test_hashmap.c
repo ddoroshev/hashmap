@@ -22,7 +22,7 @@ void test_hashmap_init(void)
     hashmap *hm = hashmap_init();
 
     ASSERT(hashmap_len(hm) == 0);
-    ASSERT(hashmap_values(hm)->length == HASHMAP_BASE_SIZE);
+    ASSERT(hashmap_get_length(hm) == HASHMAP_BASE_SIZE);
 
     hashmap_free(hm);
 }
@@ -31,7 +31,6 @@ void test_hashmap_init_fail(void)
 {
     WITH_SUCCESS_ALLOCS(0, ASSERT(hashmap_init() == NULL));
     WITH_SUCCESS_ALLOCS(1, ASSERT(hashmap_init() == NULL));
-    WITH_SUCCESS_ALLOCS(2, ASSERT(hashmap_init() == NULL));
 }
 
 void test_hashmap_free(void)
@@ -48,6 +47,7 @@ void test_hashmap_dump(void)
     hashmap_set(hm, "bc", val);
     hashmap_set(hm, "cd", val);
 
+    /* Just verify hashmap_dump doesn't crash */
     hashmap_dump(hm);
 
     hashmap_free(hm);
@@ -64,7 +64,7 @@ void test_hashmap_set(void)
     }
     ASSERT(hashmap_set(hm, "foo", val) == 0);
     ASSERT(hashmap_len(hm) == HASHMAP_BASE_SIZE + 1);
-    ASSERT(hashmap_values(hm)->length == 16);
+    ASSERT(hashmap_get_length(hm) == 16);
 
     hashmap_free(hm);
 }
@@ -111,8 +111,8 @@ void test_hashmap_find_index(void)
     for (i = 0; i < 7; i++) {
         hashmap_set(hm, keys[i], i);
     }
-    ASSERT(_hashmap_find_index(hm, keys[0], hash(keys[0])));
-    ASSERT(_hashmap_find_index(hm, keys[6], hash(keys[6])));
+    ASSERT(_hashmap_find_index(hm, keys[0], hash(keys[0])) >= 0);
+    ASSERT(_hashmap_find_index(hm, keys[6], hash(keys[6])) >= 0);
     ASSERT(_hashmap_find_index(hm, keys[7], hash(keys[7])) == -E_HASHMAP_KEY_NOT_FOUND);
 
     i++;
