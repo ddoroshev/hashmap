@@ -9,7 +9,7 @@
 
 private int hashmap_ensure_size(hashmap *hm);
 private int hashmap_resize(hashmap *hm);
-private uint32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash);
+private int32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash);
 private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash);
 
 /**
@@ -338,7 +338,7 @@ private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash)
  *
  * Return: Index of empty/deleted slot, or -E_HASHMAP_KEY_NOT_FOUND if table is full
  */
-private uint32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash)
+private int32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash)
 {
     uint32_t mask = hm->length - 1;
     uint32_t i = hash & mask;

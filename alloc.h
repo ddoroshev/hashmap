@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef UNIT_TEST
+
 extern int _test_success_allocs;
 void *tcalloc(size_t count, size_t size);
 
@@ -11,3 +13,9 @@ void *tcalloc(size_t count, size_t size);
 }
 
 #define calloc tcalloc
+
+#else
+
+#include <stdlib.h>
+
+#endif
