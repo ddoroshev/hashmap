@@ -45,7 +45,7 @@ void hashmap_free(hashmap *hm)
     if (hm == NULL) {
         return;
     }
-    
+
     hashmap_item *item;
     for (int i = 0; i < hm->length; i++) {
         item = hm->items[i];
@@ -99,7 +99,7 @@ int hashmap_set(hashmap *hm, char *key, int value)
 {
     int result;
     int is_new_key = 0;
-    
+
     if (hm == NULL || key == NULL) {
         return -E_HASHMAP_CANNOT_SET_VALUE;
     }
@@ -197,7 +197,7 @@ private int hashmap_resize(hashmap *hm)
     uint32_t old_len = hm->length;
     uint32_t est_size = ESTIMATE_SIZE(hm);
     uint32_t new_length = HASHMAP_BASE_SIZE;
-    
+
     /* Find the next power of 2 that will fit our data */
     for (new_length = HASHMAP_BASE_SIZE;
          new_length <= est_size && new_length > 0;
@@ -228,7 +228,7 @@ private int hashmap_resize(hashmap *hm)
         hm->items[index] = item;
         hm->count++;
     }
-    
+
     /* Free the deleted items and old array */
     for (int i = 0; i < old_len; i++) {
         item = old_items[i];
@@ -255,7 +255,7 @@ int hashmap_delete(hashmap *hm, char *key)
     if (hm == NULL || key == NULL) {
         return -E_HASHMAP_KEY_NOT_FOUND;
     }
-    
+
     int index = _hashmap_find_index(hm, key, hash(key));
     if (index < 0) {
         return index;
@@ -282,7 +282,7 @@ hashmap_item *hashmap_get(hashmap *hm, char *key)
     if (hm == NULL || key == NULL) {
         return NULL;
     }
-    
+
     int index = _hashmap_find_index(hm, key, hash(key));
     if (index == -E_HASHMAP_KEY_NOT_FOUND) {
         return NULL;
@@ -307,14 +307,14 @@ private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash)
     uint32_t i = hash & mask;
     uint32_t perturb;
     hashmap_item *item;
-    
+
     /* Maximum number of probes - prevent potential infinite loop */
     uint32_t max_iterations = hm->length;
     uint32_t iterations = 0;
-    
-    for (perturb = hash; iterations < max_iterations; 
+
+    for (perturb = hash; iterations < max_iterations;
          i = mask & (i * 5 + perturb + 1), perturb >>= 5, iterations++) {
-        
+
         item = hm->items[i];
         if (item == NULL) {
             return -E_HASHMAP_KEY_NOT_FOUND;
@@ -323,7 +323,7 @@ private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash)
             return i;
         }
     }
-    
+
     /* If we've probed everywhere and didn't find it, the key doesn't exist */
     return -E_HASHMAP_KEY_NOT_FOUND;
 }
@@ -344,14 +344,14 @@ private int32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash)
     uint32_t i = hash & mask;
     uint32_t perturb;
     hashmap_item *item;
-    
+
     /* Maximum number of probes - prevent potential infinite loop */
     uint32_t max_iterations = hm->length;
     uint32_t iterations = 0;
-    
-    for (perturb = hash; iterations < max_iterations; 
+
+    for (perturb = hash; iterations < max_iterations;
          i = mask & (i * 5 + perturb + 1), perturb >>= 5, iterations++) {
-        
+
         item = hm->items[i];
         if (item == NULL || item->is_deleted == 1) {
             return i;
