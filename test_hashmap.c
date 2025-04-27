@@ -60,7 +60,7 @@ void test_hashmap_set(void)
     hashmap *hm = hashmap_init();
     int val = 1;
     WITH_SUCCESS_ALLOCS(0, ASSERT(hashmap_set(hm, "ab", val) == -E_HASHMAP_CANNOT_SET_VALUE));
-    for (int i = 0; i < HASHMAP_BASE_SIZE; i++) {
+    for (uint32_t i = 0; i < HASHMAP_BASE_SIZE; i++) {
         ASSERT(hashmap_set(hm, keys[i], val) == 0);
         ASSERT(hm->length == i + 1);
     }

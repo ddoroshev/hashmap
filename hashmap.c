@@ -19,7 +19,7 @@ private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash);
  */
 hashmap *hashmap_init()
 {
-    int capacity = HASHMAP_BASE_SIZE;
+    uint32_t capacity = HASHMAP_BASE_SIZE;
     hashmap *hm = calloc(1, sizeof(hashmap));
     if (hm == NULL) {
         return NULL;
@@ -47,7 +47,7 @@ void hashmap_free(hashmap *hm)
     }
 
     hashmap_item *item;
-    for (int i = 0; i < hm->capacity; i++) {
+    for (uint32_t i = 0; i < hm->capacity; i++) {
         item = hm->items[i];
         if (item != NULL && item->key != NULL) {
             free(item->key);
@@ -89,7 +89,7 @@ int hashmap_set(hashmap *hm, char *key, int value)
 
     /* Find the key or an empty slot */
     unsigned long h = hash(key);
-    int index = _hashmap_find_index(hm, key, h);
+    int32_t index = _hashmap_find_index(hm, key, h);
     if (index == -E_HASHMAP_KEY_NOT_FOUND) {
         is_new_key = 1;
         index = _hashmap_find_empty_index(hm, h);
@@ -192,12 +192,12 @@ private int hashmap_resize(hashmap *hm)
     hm->capacity = new_capacity;
 
     /* Move all non-deleted items to the new array */
-    for (int i = 0; i < old_capacity; i++) {
+    for (uint32_t i = 0; i < old_capacity; i++) {
         item = old_items[i];
         if (item == NULL || item->is_deleted == 1) {
             continue;
         }
-        int index = _hashmap_find_empty_index(hm, item->hash);
+        int32_t index = _hashmap_find_empty_index(hm, item->hash);
         if (index == -E_HASHMAP_KEY_NOT_FOUND) {
             free(hm->items);
             hm->items = old_items;
@@ -210,7 +210,7 @@ private int hashmap_resize(hashmap *hm)
     }
 
     /* Free the deleted items and old array */
-    for (int i = 0; i < old_capacity; i++) {
+    for (uint32_t i = 0; i < old_capacity; i++) {
         item = old_items[i];
         if (item != NULL && item->is_deleted == 1) {
             free(item);
@@ -236,7 +236,7 @@ int hashmap_delete(hashmap *hm, char *key)
         return -E_HASHMAP_KEY_NOT_FOUND;
     }
 
-    int index = _hashmap_find_index(hm, key, hash(key));
+    int32_t index = _hashmap_find_index(hm, key, hash(key));
     if (index < 0) {
         return index;
     }
@@ -263,7 +263,7 @@ hashmap_item *hashmap_get(hashmap *hm, char *key)
         return NULL;
     }
 
-    int index = _hashmap_find_index(hm, key, hash(key));
+    int32_t index = _hashmap_find_index(hm, key, hash(key));
     if (index == -E_HASHMAP_KEY_NOT_FOUND) {
         return NULL;
     }
@@ -299,8 +299,10 @@ private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash)
         if (item == NULL) {
             return -E_HASHMAP_KEY_NOT_FOUND;
         }
-        if (item->is_deleted == 0 && item->hash == hash && strcmp(item->key, key) == 0) {
-            return i;
+        if (item->is_deleted == 0
+            && item->hash == hash
+            && strcmp(item->key, key) == 0) {
+            return (int32_t)i;
         }
     }
 
@@ -334,7 +336,7 @@ private int32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash)
 
         item = hm->items[i];
         if (item == NULL || item->is_deleted == 1) {
-            return i;
+            return (int32_t)i;
         }
     }
 
@@ -353,10 +355,9 @@ private int32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash)
  */
 unsigned long hash(char *s)
 {
-    unsigned long hash = 5381;
-    int c;
+    unsigned long hash = 5381, c;
 
-    while ((c = *s++)) {
+    while ((c = (unsigned long)*s++)) {
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
     }
 

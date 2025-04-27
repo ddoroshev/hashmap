@@ -5,7 +5,7 @@ PLAYGROUND_TARGET = ./bin/playground
 BENCHMARK_TARGET = ./bin/benchmark
 
 CC = gcc
-CFLAGS = -I. -Wall -std=gnu11 -fno-omit-frame-pointer
+CFLAGS = -I. -Wall -Wsign-conversion -Wextra -Werror -std=gnu11 -fno-omit-frame-pointer
 LDFLAGS =
 
 OBJS = alloc.o hashmap.o dump.o
@@ -32,7 +32,7 @@ $(TARGET): $(OBJS) $(MAIN_OBJS)
 test-build: CFLAGS += -DUNIT_TEST -fsanitize=address,undefined \
             -Wno-implicit-function-declaration -g
 test-build: LDFLAGS += -fsanitize=address,undefined
-test-build: $(TESTS_TARGET)
+test-build: clean $(TESTS_TARGET)
 
 .PHONY: test
 test: test-build
