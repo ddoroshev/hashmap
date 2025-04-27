@@ -22,17 +22,21 @@ RELEASE_BENCHMARK = $(BENCHMARK_TARGET)_release
 RELEASE_CFLAGS = $(CFLAGS) -O3 -DNDEBUG
 RELEASE_LDFLAGS = $(LDFLAGS)
 
+.PHONY: all
 all: $(TARGET)
 
 $(TARGET): $(OBJS) $(MAIN_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
+.PHONY: test-build
 test-build: CFLAGS += -Wno-implicit-function-declaration -g
 test-build: $(TESTS_TARGET)
 
+.PHONY: test
 test: test-build
 	./bin/tests
 
+.PHONY: cov
 cov: CFLAGS += -fprofile-arcs -ftest-coverage
 cov: clean test
 	lcov --directory . --capture --output-file info.cov
@@ -48,6 +52,7 @@ $(PLAYGROUND_TARGET): $(PLAYGROUND_OBJS)
 $(BENCHMARK_TARGET): $(BENCHMARK_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
+.PHONY: release
 release: CFLAGS := $(RELEASE_CFLAGS)
 release: LDFLAGS := $(RELEASE_LDFLAGS)
 release: clean $(RELEASE_TARGET) $(RELEASE_BENCHMARK)
@@ -65,27 +70,43 @@ $(RELEASE_BENCHMARK): $(BENCHMARK_OBJS)
 
 *.o: *.h
 
+.PHONY: playground
 playground: CFLAGS += -g
 playground: $(PLAYGROUND_TARGET)
 	./bin/playground
 
+.PHONY: benchmark-build
 benchmark-build: CFLAGS += -g
 benchmark-build: $(BENCHMARK_TARGET)
 
+.PHONY: benchmark
 benchmark: benchmark-build
 	./bin/benchmark
 
+.PHONY: docker-test-debug
 docker-test-debug:
 	docker build -t hashmap-test-debug -f docker/Dockerfile.debug .
 	docker run -it --rm hashmap-test-debug
 
+.PHONY: docker-playground-debug
 docker-playground-debug:
 	docker build -t hashmap-playground-debug -f docker/Dockerfile.debug .
 	docker run -it --rm hashmap-playground-debug gdb bin/playground
 
+.PHONY: valgrind
 valgrind:
 	docker build -t hashmap-valgrind -f docker/Dockerfile.valgrind .
 	docker run -it --rm hashmap-valgrind
 
+.PHONY: check
+check:
+	cppcheck --enable=all --inline-suppr --check-level=exhaustive \
+			 --suppress=missingIncludeSystem \
+			 --suppress=constParameterPointer \
+			 --suppress=constVariablePointer \
+			 --suppress=variableScope \
+			 .
+
+.PHONY: clean
 clean:
 	rm -rf $(REBUILDABLES) $(TESTS_TARGET) $(RELEASE_TARGET) $(RELEASE_BENCHMARK) **.gc* *.cov cov-report

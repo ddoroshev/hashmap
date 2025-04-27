@@ -12,7 +12,7 @@ struct rusage r;
 
 char *keys;
 
-void benchmark_init(hashmap **map) {
+static void benchmark_init(hashmap **map) {
     clock_t start, end;
     double cpu_time_used;
 
@@ -26,7 +26,7 @@ void benchmark_init(hashmap **map) {
     printf("Initialization benchmark completed. Time taken: %.5f seconds\n", cpu_time_used);
 }
 
-void benchmark_insert(hashmap *map) {
+static void benchmark_insert(hashmap *map) {
     clock_t start, end;
     double cpu_time_used;
 
@@ -44,7 +44,7 @@ void benchmark_insert(hashmap *map) {
     printf("Insertion benchmark completed. Time taken: %.5f seconds\n", cpu_time_used);
 }
 
-void benchmark_search(hashmap *map) {
+static void benchmark_search(hashmap *map) {
     clock_t start, end;
     double cpu_time_used;
 
@@ -64,7 +64,7 @@ void benchmark_search(hashmap *map) {
     printf("Search benchmark completed. Time taken: %.5f seconds\n", cpu_time_used);
 }
 
-void benchmark_delete(hashmap *map) {
+static void benchmark_delete(hashmap *map) {
     clock_t start, end;
     double cpu_time_used;
 
@@ -85,7 +85,7 @@ void benchmark_delete(hashmap *map) {
     printf("Deletion benchmark completed. Time taken: %.5f seconds\n", cpu_time_used);
 }
 
-void benchmark_free(hashmap *map) {
+static void benchmark_free(hashmap *map) {
     clock_t start, end;
     double cpu_time_used;
 
@@ -99,7 +99,7 @@ void benchmark_free(hashmap *map) {
     printf("Memory deallocation benchmark completed. Time taken: %.5f seconds\n", cpu_time_used);
 }
 
-void benchmark_mixed_workload(hashmap *map) {
+static void benchmark_mixed_workload(hashmap *map) {
     clock_t start, end;
     double cpu_time_used;
 
@@ -137,7 +137,7 @@ void benchmark_mixed_workload(hashmap *map) {
     printf("Mixed workload benchmark completed. Time taken: %.5f seconds\n", cpu_time_used);
 }
 
-long get_peak_memory() {
+static long get_peak_memory() {
     getrusage(RUSAGE_SELF, &r);
     return r.ru_maxrss;
 }

@@ -6,6 +6,10 @@
 #include "alloc.h"
 #include "hashmap.h"
 
+static int hashmap_ensure_size(hashmap *hm);
+static int hashmap_resize(hashmap *hm);
+static uint32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash);
+
 /**
  * Allocate and initialize a new hashmap with default capacity
  *
@@ -163,7 +167,7 @@ int hashmap_set(hashmap *hm, char *key, int value)
  *
  * Return: 0 on success, error code on failure
  */
-int hashmap_ensure_size(hashmap *hm)
+static int hashmap_ensure_size(hashmap *hm)
 {
     int result;
     if (hm->count >= USABLE_FRACTION(hm->length)) {
@@ -184,7 +188,7 @@ int hashmap_ensure_size(hashmap *hm)
  *
  * Return: 0 on success, error code on failure
  */
-int hashmap_resize(hashmap *hm)
+static int hashmap_resize(hashmap *hm)
 {
     hashmap_item *item;
     hashmap_item **old_items = hm->items;
@@ -332,7 +336,7 @@ int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash)
  *
  * Return: Index of empty/deleted slot, or -E_HASHMAP_KEY_NOT_FOUND if table is full
  */
-uint32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash)
+static uint32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash)
 {
     uint32_t mask = hm->length - 1;
     uint32_t i = hash & mask;
