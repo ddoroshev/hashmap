@@ -1,3 +1,5 @@
+#ifdef UNIT_TEST
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,3 +16,5 @@ void *tcalloc(size_t count, size_t size) {
 
     return result;
 }
+
+#endif

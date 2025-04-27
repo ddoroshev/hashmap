@@ -32,7 +32,7 @@ hashmap *hashmap_init()
     }
 
     hm->capacity = capacity;
-    hm->count = 0;
+    hm->length = 0;
     return hm;
 }
 
@@ -56,30 +56,8 @@ void hashmap_free(hashmap *hm)
     }
     free(hm->items);
     hm->items = NULL;
-    hm->count = 0;
+    hm->length = 0;
     free(hm);
-}
-
-/**
- * Get number of active items in hashmap.
- * @hm: Hashmap to count
- *
- * Return: Number of active (non-deleted) key-value pairs
- */
-uint32_t hashmap_len(hashmap *hm)
-{
-    return hm->count;
-}
-
-/**
- * Get the capacity of the hashmap's internal array
- * @hm: Hashmap to access
- *
- * Return: Length of the internal array
- */
-uint32_t hashmap_get_capacity(hashmap *hm)
-{
-    return hm->capacity;
 }
 
 /**
@@ -156,7 +134,7 @@ int hashmap_set(hashmap *hm, char *key, int value)
     }
 
     if (is_new_key) {
-        hm->count++;
+        hm->length++;
     }
 
     return 0;
@@ -172,7 +150,7 @@ int hashmap_set(hashmap *hm, char *key, int value)
 private int hashmap_ensure_size(hashmap *hm)
 {
     int result;
-    if (hm->count >= USABLE_FRACTION(hm->capacity)) {
+    if (hm->length >= USABLE_FRACTION(hm->capacity)) {
         result = hashmap_resize(hm);
         if (result != 0) {
             return result;
@@ -194,8 +172,8 @@ private int hashmap_resize(hashmap *hm)
 {
     hashmap_item *item;
     hashmap_item **old_items = hm->items;
-    uint32_t old_len = hm->capacity;
-    uint32_t old_count = hm->count;
+    uint32_t old_capacity = hm->capacity;
+    uint32_t old_length = hm->length;
     uint32_t est_size = ESTIMATE_SIZE(hm);
     uint32_t new_capacity = HASHMAP_BASE_SIZE;
 
@@ -204,8 +182,8 @@ private int hashmap_resize(hashmap *hm)
         new_capacity <<= 1;
     }
 
-    /* Reset count and allocate new array */
-    hm->count = 0;
+    /* Reset length and allocate new array */
+    hm->length = 0;
     hm->items = calloc(new_capacity, sizeof(hashmap_item*));
     if (hm->items == NULL) {
         hm->items = old_items;
@@ -214,7 +192,7 @@ private int hashmap_resize(hashmap *hm)
     hm->capacity = new_capacity;
 
     /* Move all non-deleted items to the new array */
-    for (int i = 0; i < old_len; i++) {
+    for (int i = 0; i < old_capacity; i++) {
         item = old_items[i];
         if (item == NULL || item->is_deleted == 1) {
             continue;
@@ -223,16 +201,16 @@ private int hashmap_resize(hashmap *hm)
         if (index == -E_HASHMAP_KEY_NOT_FOUND) {
             free(hm->items);
             hm->items = old_items;
-            hm->capacity = old_len;
-            hm->count = old_count;
+            hm->capacity = old_capacity;
+            hm->length = old_length;
             return index;
         }
         hm->items[index] = item;
-        hm->count++;
+        hm->length++;
     }
 
     /* Free the deleted items and old array */
-    for (int i = 0; i < old_len; i++) {
+    for (int i = 0; i < old_capacity; i++) {
         item = old_items[i];
         if (item != NULL && item->is_deleted == 1) {
             free(item);
@@ -267,7 +245,7 @@ int hashmap_delete(hashmap *hm, char *key)
     free(item->key);
     item->key = NULL;
     item->is_deleted = 1;
-    hm->count--;
+    hm->length--;
 
     return 0;
 }
