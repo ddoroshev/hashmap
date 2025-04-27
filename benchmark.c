@@ -147,7 +147,7 @@ int main() {
 
     keys = malloc(20 * sizeof(char) * SIZE);
     for (int i = 0; i < SIZE; i++) {
-        sprintf(&keys[i * 20], "key%d", i);
+        snprintf(&keys[i * 20], 20, "key%d", i);
     }
 
     mem_before = get_peak_memory();

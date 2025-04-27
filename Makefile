@@ -29,7 +29,9 @@ $(TARGET): $(OBJS) $(MAIN_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 .PHONY: test-build
-test-build: CFLAGS += -DUNIT_TEST -Wno-implicit-function-declaration -g
+test-build: CFLAGS += -DUNIT_TEST -fsanitize=address,undefined \
+            -Wno-implicit-function-declaration -g
+test-build: LDFLAGS += -fsanitize=address,undefined
 test-build: $(TESTS_TARGET)
 
 .PHONY: test
@@ -76,7 +78,8 @@ playground: $(PLAYGROUND_TARGET)
 	./bin/playground
 
 .PHONY: benchmark-build
-benchmark-build: CFLAGS += -g
+benchmark-build: CFLAGS += -g -fsanitize=address,undefined
+benchmark-build: LDFLAGS += -fsanitize=address,undefined
 benchmark-build: $(BENCHMARK_TARGET)
 
 .PHONY: benchmark
