@@ -37,5 +37,4 @@ uint32_t hashmap_get_length(hashmap *hm);
 int hashmap_set(hashmap*, char *key, int value);
 hashmap_item *hashmap_get(hashmap *hm, char *key);
 int hashmap_delete(hashmap *hm, char *key);
-int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash);
 unsigned long hash(char *s);

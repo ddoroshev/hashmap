@@ -29,7 +29,7 @@ $(TARGET): $(OBJS) $(MAIN_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 .PHONY: test-build
-test-build: CFLAGS += -Wno-implicit-function-declaration -g
+test-build: CFLAGS += -DUNIT_TEST -Wno-implicit-function-declaration -g
 test-build: $(TESTS_TARGET)
 
 .PHONY: test
@@ -100,12 +100,18 @@ valgrind:
 
 .PHONY: check
 check:
-	cppcheck --enable=all --inline-suppr --check-level=exhaustive \
-			 --suppress=missingIncludeSystem \
-			 --suppress=constParameterPointer \
-			 --suppress=constVariablePointer \
-			 --suppress=variableScope \
-			 .
+	cppcheck \
+		--language=c \
+		-UUNIT_TEST \
+		--safety \
+		--inline-suppr \
+		--enable=all \
+		--check-level=exhaustive \
+		--suppress=missingIncludeSystem \
+		--suppress=constParameterPointer \
+		--suppress=constVariablePointer \
+		--suppress=variableScope \
+		.
 
 .PHONY: clean
 clean:
