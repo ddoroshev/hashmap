@@ -9,7 +9,7 @@ int main() {
         printf("Failed to initialize hashmap\n");
         return 1;
     }
-    printf("Hashmap initialized with length: %u\n", hashmap_get_length(hm));
+    printf("Hashmap initialized with capacity: %u\n", hashmap_get_capacity(hm));
 
     /* Basic set and get test */
     if (hashmap_set(hm, "key1", 100) != 0) {

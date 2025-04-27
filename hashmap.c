@@ -19,19 +19,19 @@ private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash);
  */
 hashmap *hashmap_init()
 {
-    int length = HASHMAP_BASE_SIZE;
+    int capacity = HASHMAP_BASE_SIZE;
     hashmap *hm = calloc(1, sizeof(hashmap));
     if (hm == NULL) {
         return NULL;
     }
 
-    hm->items = calloc(length, sizeof(hashmap_item*));
+    hm->items = calloc(capacity, sizeof(hashmap_item*));
     if (hm->items == NULL) {
         free(hm);
         return NULL;
     }
 
-    hm->length = length;
+    hm->capacity = capacity;
     hm->count = 0;
     return hm;
 }
@@ -47,7 +47,7 @@ void hashmap_free(hashmap *hm)
     }
 
     hashmap_item *item;
-    for (int i = 0; i < hm->length; i++) {
+    for (int i = 0; i < hm->capacity; i++) {
         item = hm->items[i];
         if (item != NULL && item->key != NULL) {
             free(item->key);
@@ -72,14 +72,14 @@ uint32_t hashmap_len(hashmap *hm)
 }
 
 /**
- * Get the length of the hashmap's internal array
+ * Get the capacity of the hashmap's internal array
  * @hm: Hashmap to access
  *
  * Return: Length of the internal array
  */
-uint32_t hashmap_get_length(hashmap *hm)
+uint32_t hashmap_get_capacity(hashmap *hm)
 {
-    return hm->length;
+    return hm->capacity;
 }
 
 /**
@@ -172,7 +172,7 @@ int hashmap_set(hashmap *hm, char *key, int value)
 private int hashmap_ensure_size(hashmap *hm)
 {
     int result;
-    if (hm->count >= USABLE_FRACTION(hm->length)) {
+    if (hm->count >= USABLE_FRACTION(hm->capacity)) {
         result = hashmap_resize(hm);
         if (result != 0) {
             return result;
@@ -194,23 +194,24 @@ private int hashmap_resize(hashmap *hm)
 {
     hashmap_item *item;
     hashmap_item **old_items = hm->items;
-    uint32_t old_len = hm->length;
+    uint32_t old_len = hm->capacity;
+    uint32_t old_count = hm->count;
     uint32_t est_size = ESTIMATE_SIZE(hm);
-    uint32_t new_length = HASHMAP_BASE_SIZE;
+    uint32_t new_capacity = HASHMAP_BASE_SIZE;
 
     /* Find the next power of 2 that will fit our data */
-    for (new_length = HASHMAP_BASE_SIZE;
-         new_length <= est_size && new_length > 0;
-         new_length <<= 1);
+    while (new_capacity <= est_size) {
+        new_capacity <<= 1;
+    }
 
     /* Reset count and allocate new array */
     hm->count = 0;
-    hm->items = calloc(new_length, sizeof(hashmap_item*));
+    hm->items = calloc(new_capacity, sizeof(hashmap_item*));
     if (hm->items == NULL) {
         hm->items = old_items;
         return -E_ALLOC;
     }
-    hm->length = new_length;
+    hm->capacity = new_capacity;
 
     /* Move all non-deleted items to the new array */
     for (int i = 0; i < old_len; i++) {
@@ -222,7 +223,8 @@ private int hashmap_resize(hashmap *hm)
         if (index == -E_HASHMAP_KEY_NOT_FOUND) {
             free(hm->items);
             hm->items = old_items;
-            hm->length = old_len;
+            hm->capacity = old_len;
+            hm->count = old_count;
             return index;
         }
         hm->items[index] = item;
@@ -303,13 +305,13 @@ hashmap_item *hashmap_get(hashmap *hm, char *key)
  */
 private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash)
 {
-    uint32_t mask = hm->length - 1;
+    uint32_t mask = hm->capacity - 1;
     uint32_t i = hash & mask;
     uint32_t perturb;
     hashmap_item *item;
 
     /* Maximum number of probes - prevent potential infinite loop */
-    uint32_t max_iterations = hm->length;
+    uint32_t max_iterations = hm->capacity;
     uint32_t iterations = 0;
 
     for (perturb = hash; iterations < max_iterations;
@@ -340,13 +342,13 @@ private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash)
  */
 private int32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash)
 {
-    uint32_t mask = hm->length - 1;
+    uint32_t mask = hm->capacity - 1;
     uint32_t i = hash & mask;
     uint32_t perturb;
     hashmap_item *item;
 
     /* Maximum number of probes - prevent potential infinite loop */
-    uint32_t max_iterations = hm->length;
+    uint32_t max_iterations = hm->capacity;
     uint32_t iterations = 0;
 
     for (perturb = hash; iterations < max_iterations;

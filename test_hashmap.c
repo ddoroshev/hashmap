@@ -24,7 +24,7 @@ void test_hashmap_init(void)
     hashmap *hm = hashmap_init();
 
     ASSERT(hashmap_len(hm) == 0);
-    ASSERT(hashmap_get_length(hm) == HASHMAP_BASE_SIZE);
+    ASSERT(hashmap_get_capacity(hm) == HASHMAP_BASE_SIZE);
 
     hashmap_free(hm);
 }
@@ -66,7 +66,7 @@ void test_hashmap_set(void)
     }
     ASSERT(hashmap_set(hm, "foo", val) == 0);
     ASSERT(hashmap_len(hm) == HASHMAP_BASE_SIZE + 1);
-    ASSERT(hashmap_get_length(hm) == 16);
+    ASSERT(hashmap_get_capacity(hm) == 16);
 
     hashmap_free(hm);
 }

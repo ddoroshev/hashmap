@@ -7,8 +7,8 @@
 
 /* From CPython: calculate usable fraction of hash table size (2/3) */
 #define USABLE_FRACTION(n) (((n) << 1)/3)
-/* Estimate size for resize based on current count and table length */
-#define ESTIMATE_SIZE(hm) (hm->count*2 + (hm->length >> 1))
+/* Estimate size for resize based on current count and table capacity */
+#define ESTIMATE_SIZE(hm) (hm->count*2 + (hm->capacity >> 1))
 
 /* Error codes for hashmap operations */
 #define E_HASHMAP_KEY_NOT_FOUND 1
@@ -26,14 +26,14 @@ typedef struct {
 
 typedef struct {
     uint32_t count;       /* number of active (non-deleted) items */
-    uint32_t length;      /* number of slots in the items array   */
+    uint32_t capacity;      /* number of slots in the items array   */
     hashmap_item **items; /* array of hashmap_item pointers       */
 } hashmap;
 
 hashmap *hashmap_init();
 void hashmap_free(hashmap *hm);
 uint32_t hashmap_len(hashmap *hm);
-uint32_t hashmap_get_length(hashmap *hm);
+uint32_t hashmap_get_capacity(hashmap *hm);
 int hashmap_set(hashmap*, char *key, int value);
 hashmap_item *hashmap_get(hashmap *hm, char *key);
 int hashmap_delete(hashmap *hm, char *key);
