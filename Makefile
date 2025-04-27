@@ -8,7 +8,7 @@ CC = gcc
 CFLAGS = -I. -Wall -Wsign-conversion -Wextra -Werror -std=gnu11 -fno-omit-frame-pointer
 LDFLAGS =
 
-OBJS = alloc.o hashmap.o dump.o
+OBJS = hashmap.o dump.o
 TEST_OBJS = test_hashmap.o test.o
 MAIN_OBJS = main.o
 PLAYGROUND_OBJS = playground.o $(OBJS)

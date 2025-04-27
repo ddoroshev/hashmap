@@ -4,19 +4,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc.h"
 #include "hashmap.h"
 #include "assert.h"
 
 char *keys[] = {
-    "ab",  // 5863208 -> 0
-    "bc",  // 5863242 -> 2
-    "cd",  // 5863276 -> 4
-    "de",  // 5863310 -> 6
-    "ef",  // 5863344 -> 0
-    "fg",  // 5863378 -> 2
-    "gh",  // 5863412 -> 4
-    "hi"   // 5863446 -> 6
+    "ab",  /* 5863208 -> 0 */
+    "bc",  /* 5863242 -> 2 */
+    "cd",  /* 5863276 -> 4 */
+    "de",  /* 5863310 -> 6 */
+    "ef",  /* 5863344 -> 0 */
+    "fg",  /* 5863378 -> 2 */
+    "gh",  /* 5863412 -> 4 */
+    "hi"   /* 5863446 -> 6 */
 };
 
 void test_hashmap_init(void)
@@ -27,12 +26,6 @@ void test_hashmap_init(void)
     ASSERT(hm->capacity == HASHMAP_BASE_SIZE);
 
     hashmap_free(hm);
-}
-
-void test_hashmap_init_fail(void)
-{
-    WITH_SUCCESS_ALLOCS(0, ASSERT(hashmap_init() == NULL));
-    WITH_SUCCESS_ALLOCS(1, ASSERT(hashmap_init() == NULL));
 }
 
 void test_hashmap_free(void)
@@ -59,7 +52,6 @@ void test_hashmap_set(void)
 {
     hashmap *hm = hashmap_init();
     int val = 1;
-    WITH_SUCCESS_ALLOCS(0, ASSERT(hashmap_set(hm, "ab", val) == -E_HASHMAP_CANNOT_SET_VALUE));
     for (uint32_t i = 0; i < HASHMAP_BASE_SIZE; i++) {
         ASSERT(hashmap_set(hm, keys[i], val) == 0);
         ASSERT(hm->length == i + 1);

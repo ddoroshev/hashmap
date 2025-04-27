@@ -3,7 +3,6 @@
 int main(void)
 {
     test_hashmap_init();
-    test_hashmap_init_fail();
     test_hashmap_free();
     test_hashmap_dump();
     test_hashmap_set();

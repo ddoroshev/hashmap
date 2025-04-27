@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc.h"
 #include "hashmap.h"
 #include "private.h"
 
