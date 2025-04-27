@@ -14,7 +14,7 @@ private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash);
 /**
  * Allocate and initialize a new hashmap with default capacity
  *
- * Return: Pointer to new hashmap, or NULL if allocation fails
+ * @return  Pointer to new hashmap, or NULL if allocation fails
  */
 hashmap *hashmap_init()
 {
@@ -37,7 +37,7 @@ hashmap *hashmap_init()
 
 /**
  * Free all memory used by a hashmap
- * @hm: Hashmap to free
+ * @param hm  Hashmap to free
  */
 void hashmap_free(hashmap *hm)
 {
@@ -61,16 +61,16 @@ void hashmap_free(hashmap *hm)
 
 /**
  * Set a key-value pair in the hashmap
- * @hm: Hashmap to update
- * @key: String key to set
- * @value: Integer value to store
+ * @param hm  Hashmap to update
+ * @param key  String key to set
+ * @param value  Integer value to store
  *
  * If the key already exists, its value is updated.
  * If the key doesn't exist, a new entry is created.
  * The key string is copied, so the original can be freely modified
  * or deallocated after this call.
  *
- * Return: 0 on success, negative error code on failure
+ * @return  0 on success, negative error code on failure
  */
 int hashmap_set(hashmap *hm, char *key, int value)
 {
@@ -142,9 +142,9 @@ int hashmap_set(hashmap *hm, char *key, int value)
 /**
  * Resize hashmap if it's too full, i.e. the load factor is above
  * the threshold.
- * @hm: Hashmap to check
+ * @param hm  Hashmap to check
  *
- * Return: 0 on success, error code on failure
+ * @return  0 on success, error code on failure
  */
 private int hashmap_ensure_size(hashmap *hm)
 {
@@ -160,12 +160,12 @@ private int hashmap_ensure_size(hashmap *hm)
 
 /**
  * Resize hashmap to a larger capacity.
- * @hm: Hashmap to resize
+ * @param hm  Hashmap to resize
  *
  * Creates a new, larger array and rehashes all existing items
  * into it. Deleted items are purged during the resize.
  *
- * Return: 0 on success, error code on failure
+ * @return  0 on success, error code on failure
  */
 private int hashmap_resize(hashmap *hm)
 {
@@ -221,13 +221,13 @@ private int hashmap_resize(hashmap *hm)
 
 /**
  * Delete a key-value pair from the hashmap
- * @hm: Hashmap to modify
- * @key: Key to delete
+ * @param hm  Hashmap to modify
+ * @param key  Key to delete
  *
  * Mark the item as deleted and free associated key memory.
  * The slot remains occupied but marked as deleted until a resize.
  *
- * Return: 0 on success, error code on failure
+ * @return  0 on success, error code on failure
  */
 int hashmap_delete(hashmap *hm, char *key)
 {
@@ -251,10 +251,10 @@ int hashmap_delete(hashmap *hm, char *key)
 
 /**
  * Get a value by key from the hashmap
- * @hm: Hashmap to search
- * @key: Key to look up
+ * @param hm  Hashmap to search
+ * @param key  Key to look up
  *
- * Return: Pointer to hashmap_item if found, NULL if not found
+ * @return  Pointer to hashmap_item if found, NULL if not found
  */
 hashmap_item *hashmap_get(hashmap *hm, char *key)
 {
@@ -271,14 +271,14 @@ hashmap_item *hashmap_get(hashmap *hm, char *key)
 
 /**
  * Find the array index of a key.
- * @hm: Hashmap to search
- * @key: Key to find
- * @hash: Pre-computed hash of the key
+ * @param hm  Hashmap to search
+ * @param key  Key to find
+ * @param hash  Pre-computed hash of the key
  *
  * Uses quadratic probing to handle collisions.
  * The probing sequence is derived from the CPython dict implementation.
  *
- * Return: Non-negative index if found, -E_HASHMAP_KEY_NOT_FOUND if not found
+ * @return  Non-negative index if found, -E_HASHMAP_KEY_NOT_FOUND if not found
  */
 private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash)
 {
@@ -311,13 +311,13 @@ private int32_t _hashmap_find_index(hashmap *hm, char *key, uint32_t hash)
 
 /**
  * Find empty or deleted slot for insertion.
- * @hm: Hashmap to search
- * @hash: Hash value to use for probing
+ * @param hm  Hashmap to search
+ * @param hash  Hash value to use for probing
  *
  * Uses the same probing sequence as _hashmap_find_index to find
  * the first empty or deleted slot.
  *
- * Return: Index of empty/deleted slot, or -E_HASHMAP_KEY_NOT_FOUND if table is full
+ * @return  Index of empty/deleted slot, or -E_HASHMAP_KEY_NOT_FOUND if table is full
  */
 private int32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash)
 {
@@ -345,12 +345,12 @@ private int32_t _hashmap_find_empty_index(hashmap *hm, uint32_t hash)
 
 /**
  * DJB2 hash function for strings.
- * @s: String to hash
+ * @param s  String to hash
  *
  * This is the classic DJB2 hash algorithm:
  * hash(i) = hash(i-1) * 33 + str[i]
  *
- * Return: 32-bit hash value
+ * @return  32-bit hash value
  */
 unsigned long hash(char *s)
 {

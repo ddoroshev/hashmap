@@ -9,3 +9,5 @@ cov-report
 FlameGraph
 *.perf
 perf.*
+html/
+latex/
